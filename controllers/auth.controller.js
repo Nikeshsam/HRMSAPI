@@ -1,0 +1,90 @@
+import User from "../model/User.model.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { JWT_EXPIRES_IN, JWT_SECRET } from "../config/config.js";
+import CompanyRegistration from "../model/CompanyRegister.model.js";
+
+
+export const registerCompany = async (req, res) => {
+    const { name, email, organizationName, password, confirmPassword } = req.body;
+
+    if (!name || !email || !organizationName || !password || !confirmPassword) {
+        return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    if (password !== confirmPassword) {
+        return res.status(400).json({ message: 'Passwords do not match' });
+    }
+
+    try {
+        const existingCompany = await CompanyRegistration.findOne({ email });
+        if (existingCompany) {
+            return res.status(400).json({ message: 'Company already registered with this email' });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const newCompany = new CompanyRegistration({
+            name,
+            email,
+            organizationName
+        });
+        
+        await newCompany.save();
+
+        const newUser = new User({
+            name,
+            email,
+            password: hashedPassword,
+            confirmPassword: hashedPassword,
+            role:"admin",
+            company: newCompany._id
+        });
+
+        await newUser.save();
+
+        res.status(201).json({ message: 'Company registered successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+export const signIn = async (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).json({ message: "Email and password are required" });
+    }
+
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(401).json({ message: "Invalid email or password" });
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(401).json({ message: "Invalid email or password" });
+        }
+
+       const token = jwt.sign({userId:user._id},JWT_SECRET,{expiresIn:JWT_EXPIRES_IN});
+
+        res.status(200).json({
+            success:true,
+            message: "Login successful",
+            data:{
+                token,
+                user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role
+            }
+            }
+           
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
