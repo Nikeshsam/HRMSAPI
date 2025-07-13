@@ -88,3 +88,22 @@ export const signIn = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 }
+
+export const validateUser = async(req,res)=>{
+    try {
+        // User and token are already set by the authorize middleware
+        const user = req.user;
+        const token = req.token;
+
+        res.status(200).json({
+            success: true,
+            message: "User validated successfully",
+            data: {
+                token,
+                user
+            }
+        });
+    } catch (error) {
+        res.status(401).json({ message: "Invalid or expired token" });
+    }
+}
