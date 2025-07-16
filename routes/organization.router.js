@@ -1,9 +1,9 @@
 import {Router} from 'express';
-import {insertOrganizationDetails} from '../controllers/organization.controller.js';
+import {insertOrganizationDetails,getOrganizationDetails} from '../controllers/organization.controller.js';
 import { validateUser } from '../controllers/auth.controller.js';
 const organizationRouter = Router();
 
 organizationRouter.post('/',validateUser,insertOrganizationDetails);
-
+organizationRouter.post('/',validateUser,getOrganizationDetails);
 
 export default organizationRouter;
