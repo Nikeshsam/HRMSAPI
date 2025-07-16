@@ -62,3 +62,25 @@ export const insertOrganizationDetails = async (req, res) => {
         return res.status(500).json({ error:error });
     }
 }
+
+export const getOrganizationDetails = async (req, res) => { 
+    const user = req.user;
+    if (!user || !user.company) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+    const company = user.company; 
+
+    try {
+        const organization = await Organization.findOne({ companyId: company._id });
+        if (!organization) {
+            return res.status(404).json({ message: 'Organization not found' });
+        }
+        return res.status(200).json({
+            success:true,
+            message: 'Organization details retrieved successfully',
+            organization: organization
+        });
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+}
