@@ -14,11 +14,11 @@ export const insertOrganizationDetails = async (req, res) => {
         zipCode,
         phoneNumber,
         faxNumber,
-        websiteURL,
-        fiscalYear,
+        website,
+        fiscal,
         timeZone,
-        taxId,
-        companyId
+        taxID,
+        companyID
     } = req.body;
     
     const user = req.user;
@@ -26,12 +26,12 @@ export const insertOrganizationDetails = async (req, res) => {
         return res.status(401).json({ message: 'Unauthorized' });
     }
     const company = user.company; 
-
-    if(!organizationName || !industry || !businessType || !companyAddress || !street || !city || !state || !zipCode || !phoneNumber || !faxNumber || !websiteURL || !fiscalYear || !timeZone || !taxId) {
+   
+    if(!organizationName || !industry || !businessType || !companyAddress || !street || !city || !state || !zipCode || !phoneNumber || !faxNumber || !website || !fiscal || !timeZone || !taxID) {
         return res.status(400).json({ message: 'All fields are required' });
     }
     try{
-        const existOrganization= await Organization.findOne({companyId});
+        const existOrganization= await Organization.findOne({companyID});
         if(existOrganization) {
             return res.status(400).json({ message: 'Organization already exists' });
         }
@@ -48,11 +48,11 @@ export const insertOrganizationDetails = async (req, res) => {
             zipCode,
             phoneNumber,
             faxNumber,
-            websiteURL,
-            fiscalYear,
+            website,
+            fiscal,
             timeZone,
-            taxId,
-            companyId
+            taxID,
+            companyID
         });
 
         await newOrganization.save();

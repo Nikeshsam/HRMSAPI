@@ -73,13 +73,13 @@ const OrganizationSchema = new mongoose.Schema({
         required: [true, 'Fax Number is required'],
         trim: true,
     },
-    websiteURL:{
+    website:{
         type: String,
         required: [true, 'Website URL is required'],
         trim: true,
         match: [/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/, 'Please use a valid URL'],
     },
-    fiscalYear:{
+    fiscal:{
         type: String,
         required: [true, 'Fiscal Year is required'],
         trim: true,
@@ -93,14 +93,14 @@ const OrganizationSchema = new mongoose.Schema({
         minLength: 2,
         maxLength: 100,
     },  
-    taxId:{
+    taxID:{
         type: String,
         required: [true, 'Tax ID is required'],
         trim: true,
         minLength: 2,
         maxLength: 100,
     },
-    companyId:{
+    companyID:{
         type: String,
         required: [true, 'Company ID is required'],
         trim: true,
