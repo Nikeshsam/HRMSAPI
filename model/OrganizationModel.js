@@ -17,14 +17,12 @@ const OrganizationSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Industry is required'],
         trim: true,
-        minLength: 2,
         maxLength: 100,
     },
     businessType: {
         type: String,
         required: [true, 'Business Type is required'],
         trim: true,
-        minLength: 2,
         maxLength: 100,
     },
     companyAddress: {
@@ -83,21 +81,18 @@ const OrganizationSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Fiscal Year is required'],
         trim: true,
-        minLength: 2,
         maxLength: 100,
     },
     timeZone: {
         type: String,
         required: [true, 'Time Zone is required'],
         trim: true,
-        minLength: 2,
         maxLength: 100,
     },  
     taxID:{
         type: String,
         required: [true, 'Tax ID is required'],
         trim: true,
-        minLength: 2,
         maxLength: 100,
     },
     companyID:{
