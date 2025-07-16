@@ -4,6 +4,6 @@ import { validateUser } from '../controllers/auth.controller.js';
 const organizationRouter = Router();
 
 organizationRouter.post('/',validateUser,insertOrganizationDetails);
-organizationRouter.post('/',validateUser,getOrganizationDetails);
+organizationRouter.get('/',validateUser,getOrganizationDetails);
 
 export default organizationRouter;
