@@ -27,12 +27,12 @@ export const insertOrganizationDetails = async (req, res) => {
     }
     const company = user.company; 
    
-    if(!organizationName || !industry || !businessType || !companyAddress || !street || !city || !state || !zipCode || !phoneNumber || !faxNumber || !website || !fiscal || !timeZone || !taxID) {
+    if (!organizationName || !industry || !businessType || !companyAddress || !street || !city || !state || !zipCode || !phoneNumber || !faxNumber || !website || !fiscal || !timeZone || !taxID) {
         return res.status(400).json({ message: 'All fields are required' });
     }
-    try{
-        const existOrganization= await Organization.findOne({companyID});
-        if(existOrganization) {
+    try {
+        const existOrganization = await Organization.findOne({ companyID });
+        if (existOrganization) {
             return res.status(400).json({ message: 'Organization already exists' });
         }
 
@@ -55,11 +55,16 @@ export const insertOrganizationDetails = async (req, res) => {
             companyID
         });
 
+        await newOrganization.validate(); 
+
         await newOrganization.save();
         return res.status(201).json({ message: 'Organization details inserted successfully', organization: newOrganization });
 
-    }catch(error) {
-        return res.status(500).json({ error:error });
+    } catch (error) {
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({ message: 'Validation error', errors: error.errors });
+        }
+        return res.status(500).json({ error: error.message });
     }
 }
 
