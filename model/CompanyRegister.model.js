@@ -22,6 +22,10 @@ organizationName: {
     minLength: 2,
     maxLength: 100,
 },
+companyProfileStatus:{
+    type:Boolean,
+    default:false,
+}
 });
 const CompanyRegistration = mongoose.model('CompanyRegistrationDetails',companyRegisterSchema);
 

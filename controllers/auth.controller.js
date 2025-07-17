@@ -59,6 +59,7 @@ export const signIn = async (req, res) => {
 
     try {
         const user = await User.findOne({ email });
+        const {companyProfileStatus} = await CompanyRegistration.findById(user.company);
         if (!user) {
             return res.status(401).json({ message: "Invalid email or password" });
         }
@@ -80,7 +81,8 @@ export const signIn = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role
-            }
+            },
+            companyProfileStatus
             }
            
         });
@@ -94,14 +96,21 @@ export const validateUser = async(req,res)=>{
         // User and token are already set by the authorize middleware
         const user = req.user;
         const token = req.token;
-
+        const {company} = user;
+        const {companyProfileStatus} = await CompanyRegistration.findById(company);
         res.status(200).json({
             success: true,
             message: "User validated successfully",
-            data: {
+            data:{
                 token,
-                user
-            }
+                user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role
+            },
+            companyProfileStatus
+        }
         });
     } catch (error) {
         res.status(401).json({ message: "Invalid or expired token" });

@@ -75,7 +75,7 @@ const OrganizationSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Website URL is required'],
         trim: true,
-        match: [/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/, 'Please use a valid URL'],
+        match: [/^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/, 'Please use a valid URL'],
     },
     fiscal:{
         type: String,

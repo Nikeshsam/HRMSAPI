@@ -56,7 +56,7 @@ export const insertOrganizationDetails = async (req, res) => {
         });
 
         await newOrganization.validate(); 
-
+        await CompanyRegistration.findByIdAndUpdate(company, { companyProfileStatus: true })
         await newOrganization.save();
         return res.status(201).json({ message: 'Organization details inserted successfully', organization: newOrganization });
 
@@ -76,7 +76,7 @@ export const getOrganizationDetails = async (req, res) => {
     const company = user.company; 
 
     try {
-        const organization = await Organization.findOne({ companyId: company._id });
+        const organization = await Organization.findOne({ company });
         if (!organization) {
             return res.status(404).json({ message: 'Organization not found' });
         }
