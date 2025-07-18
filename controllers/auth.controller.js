@@ -3,9 +3,12 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { JWT_EXPIRES_IN, JWT_SECRET } from "../config/config.js";
 import CompanyRegistration from "../model/CompanyRegister.model.js";
+import mongoose from "mongoose";
 
 
 export const registerCompany = async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
     const { name, email, organizationName, password, confirmPassword } = req.body;
 
     if (!name || !email || !organizationName || !password || !confirmPassword) {
@@ -31,34 +34,36 @@ export const registerCompany = async (req, res) => {
             organizationName
         });
         
-        await newCompany.save();
+        await newCompany.save({session});
 
         const newUser = new User({
             name,
             email,
             password: hashedPassword,
-            confirmPassword: hashedPassword,
             role:"admin",
             company: newCompany._id
         });
 
-        await newUser.save();
-
+        await newUser.save({session});
+        await session.commitTransaction();
+        session.endSession();
         res.status(201).json({ message: 'Company registered successfully' });
     } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
         res.status(500).json({ message: error.message });
     }
 }
 
 export const signIn = async (req, res) => {
     const { email, password } = req.body;
-
     if (!email || !password) {
         return res.status(400).json({ message: "Email and password are required" });
     }
 
     try {
         const user = await User.findOne({ email });
+        console.log(user);
         const {companyProfileStatus} = await CompanyRegistration.findById(user.company);
         if (!user) {
             return res.status(401).json({ message: "Invalid email or password" });
