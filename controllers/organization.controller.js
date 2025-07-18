@@ -3,6 +3,11 @@ import Organization from "../model/OrganizationModel.js";
 
 
 export const insertOrganizationDetails = async (req, res) => {
+
+    const session = await mongoose.startSession();
+
+    session.startTransaction();
+
     const {
         organizationName,
         industry,
@@ -22,14 +27,17 @@ export const insertOrganizationDetails = async (req, res) => {
     } = req.body;
     
     const user = req.user;
+
     if (!user || !user.company) {
         return res.status(401).json({ message: 'Unauthorized' });
     }
+
     const company = user.company; 
    
     if (!organizationName || !industry || !businessType || !companyAddress || !street || !city || !state || !zipCode || !phoneNumber || !faxNumber || !website || !fiscal || !timeZone || !taxID) {
         return res.status(400).json({ message: 'All fields are required' });
     }
+
     try {
         const existOrganization = await Organization.findOne({ companyID });
         if (existOrganization) {
@@ -56,12 +64,21 @@ export const insertOrganizationDetails = async (req, res) => {
         });
 
         await newOrganization.validate(); 
-        await CompanyRegistration.findByIdAndUpdate(company, { companyProfileStatus: true })
-        await newOrganization.save();
+
+        await CompanyRegistration.findByIdAndUpdate(company, { companyProfileStatus: true });
+
+        await newOrganization.save({session});
+
+        await session.commitTransaction();
+
+        session.endSession();
+        
         return res.status(201).json({ message: 'Organization details inserted successfully', organization: newOrganization });
 
     } catch (error) {
         if (error.name === 'ValidationError') {
+            await session.abortTransaction();
+            session.endSession();
             return res.status(400).json({ message: 'Validation error', errors: error.errors });
         }
         return res.status(500).json({ error: error.message });

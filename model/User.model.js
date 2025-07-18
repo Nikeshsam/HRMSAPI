@@ -26,12 +26,6 @@ const userMasterSchema = new mongoose.Schema({
         trim: true,
         minLength: 6,
     },
-    confirmPassword: {
-    type: String,
-    required: [true, 'Confirm Password is required'],
-    trim: true,
-    minLength: 6,
-    },
     role: {
         type: String,
         enum: ["admin", "user"],
@@ -40,6 +34,6 @@ const userMasterSchema = new mongoose.Schema({
     },
 });
 
-const User = mongoose.model("UserMaster", userMasterSchema);
+const User = mongoose.model("User", userMasterSchema);
 
 export default User;
