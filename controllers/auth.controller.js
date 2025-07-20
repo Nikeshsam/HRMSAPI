@@ -57,6 +57,7 @@ export const registerCompany = async (req, res) => {
 
 export const signIn = async (req, res) => {
     const { email, password } = req.body;
+    console.log(email, password);
     if (!email || !password) {
         return res.status(400).json({ message: "Email and password are required" });
     }

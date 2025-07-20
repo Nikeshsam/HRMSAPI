@@ -1,6 +1,6 @@
 import CompanyRegistration from "../model/CompanyRegister.model.js";
 import Organization from "../model/OrganizationModel.js";
-
+import mongoose from "mongoose";
 
 export const insertOrganizationDetails = async (req, res) => {
 
