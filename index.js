@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import mongoose from 'mongoose';
+// import mongoose from 'mongoose';
 import { PORT } from './config/config.js';
 import connectToDatabase from './database/mongodb.js';
 import cookieParser from 'cookie-parser';

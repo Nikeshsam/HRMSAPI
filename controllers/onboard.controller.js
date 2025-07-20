@@ -1,5 +1,5 @@
-import Employees from "../model/Employees.model";
-import User from "../model/User.model";
+import Employees from "../model/Employees.model.js";
+import User from "../model/User.model.js";
 
 export const onboardEmployee = async (req, res)  => {
     const session =  await mongoose.startSession()

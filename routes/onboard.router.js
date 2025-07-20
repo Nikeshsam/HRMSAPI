@@ -1,6 +1,6 @@
 import { Router } from "express";
-import authorize from "../middlewares/auth.middleware";
-import { deleteEmployee, getEmployee, getEmployees, onboardEmployee, updateEmployee } from "../controllers/onboard.controller";
+import authorize from "../middlewares/auth.middleware.js";
+import { deleteEmployee, getEmployee, getEmployees, onboardEmployee, updateEmployee } from "../controllers/onboard.controller.js";
 
 const onboardRouter = Router();
 
@@ -17,3 +17,5 @@ onboardRouter.get("/report", (req, res) => {
   // Logic to generate employee report
   res.send("Employee report generated");
 });
+
+export default onboardRouter;
