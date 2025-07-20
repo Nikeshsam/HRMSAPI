@@ -7,6 +7,7 @@ import connectToDatabase from './database/mongodb.js';
 import cookieParser from 'cookie-parser';
 import authRouter from './routes/auth.router.js';
 import organizationRouter from './routes/organization.router.js';
+import onboardRouter from './routes/onboard.router.js'
 const app=express();
 
 app.use(bodyParser.json({limit:"30mb",extended:true}));
@@ -18,6 +19,7 @@ app.use(cookieParser()); //handle cookies
 
 app.use('/api/v1/authentication',authRouter);
 app.use('/api/v1/organization',organizationRouter);
+app.use('/api/v1/employee',onboardRouter);
 
 app.listen(PORT,async()=>{
     console.log(`Server Running in port:${PORT}`);
