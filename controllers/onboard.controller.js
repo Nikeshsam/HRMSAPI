@@ -1,8 +1,12 @@
 import Employees from "../model/Employees.model.js";
 import User from "../model/User.model.js";
+import { generateExcelFromJSON } from "../services/excelExport.service.js";
+import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
+
 
 export const onboardEmployee = async (req, res)  => {
-    const session =  await mongoose.startSession()
+    const session =  await mongoose.startSession();
     session.startTransaction();
     const {
         employeeId,
@@ -25,29 +29,30 @@ export const onboardEmployee = async (req, res)  => {
     }
     
     const company = user.company;
-    
     if (!employeeId || !firstName || !lastName || !email || !phoneNumber || !department || !designation || !workLocation || !employmentType || !joiningDate) {
         return res.status(400).json({ message: 'All fields are required' });
     }
+    
+        
 
     try{
         const existingEmployee = await Employees.findOne({employeeId});
+        
         if(existingEmployee){
             return res.status(400).json({message: 'Employee already onboarded with this ID'});
         }
-
+        
         const password =employeeId; 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-
         const newUser = new User({
-            name: `${firstName} ${lastName}`,
+            name: employeeId,
             email,
             password: hashedPassword,
             role: employeeType,
             company: company,
         });
-
+        await newUser.validate();
         await newUser.save({session});
 
         const newEmployee = new Employees({
@@ -75,7 +80,7 @@ export const onboardEmployee = async (req, res)  => {
     }catch(error){
         await session.abortTransaction();
         session.endSession();
-        return res.status(500).json({message:error});
+        return res.status(500).json({error});
     }
 }
 
@@ -216,8 +221,33 @@ export const searchEmployees = async (req, res) => {
         return res.status(200).json({
             success:true,
             message:'Employee data retrieved successfully',
-            data:employees,
+            data:filteredEmployees,
         });
+    }catch(error){  
+        return res.status(500).json({message:error});
+    }
+
+}
+
+
+export const exportEmployeesExcel = async (req, res) => {
+    const user = req.user;
+    const company = user.company;
+    if(!user || !user.company && user.role !=='admin'){
+        return res.status(401).json({message:'Unauthorized'})
+    }
+    try{
+        const users= await User.find({company}).select('_id'); // Fetching only user IDs for employees in the company
+        if (!users || users.length === 0) {
+            return res.status(404).json({message:'No employees found for this company'});
+        }
+        const userIds = users.map(user => user._id);
+        const employees = await Employees.find({userId: {$in: userIds}},'employeeId firstName lastName email phoneNumber department designation workLocation employmentType joiningDate status -_id').lean();
+        const excelBuffer = generateExcelFromJSON(employees);
+        
+        res.setHeader('Content-Disposition', 'attachment; filename=EmployeeData.xlsx');
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.send(excelBuffer);
     }catch(error){  
         return res.status(500).json({message:error});
     }

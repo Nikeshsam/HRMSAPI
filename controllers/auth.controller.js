@@ -65,10 +65,10 @@ export const signIn = async (req, res) => {
     try {
         const user = await User.findOne({ email });
         console.log(user);
-        const {companyProfileStatus} = await CompanyRegistration.findById(user.company);
         if (!user) {
             return res.status(401).json({ message: "Invalid email or password" });
         }
+        const {companyProfileStatus} = await CompanyRegistration.findById(user.company);
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
