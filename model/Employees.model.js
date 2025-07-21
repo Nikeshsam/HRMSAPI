@@ -22,7 +22,6 @@ const employeeSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true,
-        minLength: 2,
         maxLength: 50
     },
     email:{

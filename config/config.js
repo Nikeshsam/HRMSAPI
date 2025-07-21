@@ -9,4 +9,6 @@ export const{
     DB_URI,
     JWT_SECRET,
     JWT_EXPIRES_IN,
+    EMAIL_PASSWORD,
+    FRONTEND_URL
 }=process.env

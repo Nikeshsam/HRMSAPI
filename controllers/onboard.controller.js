@@ -3,6 +3,8 @@ import User from "../model/User.model.js";
 import { generateExcelFromJSON } from "../services/excelExport.service.js";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
+import CompanyRegistration from "../model/CompanyRegister.model.js";
+import { sendEmail } from "../utils/send-email.js";
 
 
 export const onboardEmployee = async (req, res)  => {
@@ -52,7 +54,6 @@ export const onboardEmployee = async (req, res)  => {
             return res.status(400).json({message: 'Employee already onboarded with this ID'});
         }
         const existingUser=await User.findOne({email});
-        console.log(existingEmployee);
         if(existingUser){
             return res.status(400).json({message:'User already exist with the same email'})
         }
@@ -85,11 +86,29 @@ export const onboardEmployee = async (req, res)  => {
             joiningDate,
             offerLetter
         })
-    
+        const {name} = await CompanyRegistration.findById({_id:company});
 
         await newEmployee.validate(); // Validate the new employee data
         await newEmployee.save({session});
         
+        await sendEmail({
+            to:email,
+            type:'add Employee',
+            employee:{
+            firstName,
+            lastName,
+            email,
+            phoneNumber,
+            department,
+            designation,
+            workLocation,
+            employmentType,
+            joiningDate,
+            companyName:name
+        },
+        })
+        
+
         await session.commitTransaction();
         session.endSession();
 
