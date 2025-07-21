@@ -62,6 +62,10 @@ const employeeSchema = new mongoose.Schema({
         type: Date,
         required: true
     },
+    offerLetter: {
+        base64: String,
+        contentType: String,
+    },
     status:{
         type: String,
         enum: ['Pending', 'Completed', 'Rejected'],

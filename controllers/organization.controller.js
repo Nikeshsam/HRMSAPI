@@ -16,6 +16,7 @@ export const insertOrganizationDetails = async (req, res) => {
         street,
         city,
         state,
+        country,
         zipCode,
         phoneNumber,
         faxNumber,
@@ -23,6 +24,8 @@ export const insertOrganizationDetails = async (req, res) => {
         fiscal,
         timeZone,
         taxID,
+        taxMethod,
+        dateFormat,
         companyID
     } = req.body;
     
@@ -53,6 +56,7 @@ export const insertOrganizationDetails = async (req, res) => {
             street,
             city,
             state,
+            country,
             zipCode,
             phoneNumber,
             faxNumber,
@@ -60,6 +64,8 @@ export const insertOrganizationDetails = async (req, res) => {
             fiscal,
             timeZone,
             taxID,
+            taxMethod,
+            dateFormat,
             companyID
         });
 

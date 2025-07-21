@@ -55,6 +55,13 @@ export const onboardEmployee = async (req, res)  => {
         const password =employeeId; 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
+
+        const existingUser= Employees.find({email});
+
+        if(existingUser){
+            return res.status(400).json({message:'User already exist with the same email'})
+        }
+
         const newUser = new User({
             name: employeeId,
             email,
@@ -76,7 +83,8 @@ export const onboardEmployee = async (req, res)  => {
             designation,
             workLocation,
             employmentType,
-            joiningDate
+            joiningDate,
+            offerLetter
         })
     
 
@@ -95,25 +103,55 @@ export const onboardEmployee = async (req, res)  => {
 }
 
 export const getEmployees = async (req, res) => {
-    const user = req.user;
-    const company = user.company;
-    if(!user || !user.company && user.role !=='admin'){
-        return res.status(401).json({message:'Unauthorized'})
+     const user = req.user;
+    const { searchTerm = '', page = 1, limit = 10 } = req.query;
+    const company = user?.company;
+
+    if (!user || (!company && user.role !== 'admin')) {
+        return res.status(401).json({ message: 'Unauthorized' });
     }
-    try{
-        const users= await User.find({company}).select('_id'); // Fetching only user IDs for employees in the company
-        if (!users || users.length === 0) {
-            return res.status(404).json({message:'No employees found for this company'});
+
+    try {
+        const users = await User.find({ company }).select('_id');
+        if (!users.length) {
+            return res.status(404).json({ message: 'No employees found for this company' });
         }
+
         const userIds = users.map(user => user._id);
-        const employees = await Employees.find({userId: {$in: userIds}})
-        return res.status(200).json({
-            success:true,
-            message:'Employee data retrieved successfully',
-            data:employees,
+
+        const regex = new RegExp(searchTerm, 'i');
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+
+        const employees = await Employees.find({
+            userId: { $in: userIds },
+            $or: [
+                { firstName: regex },
+                { lastName: regex },
+                { email: regex }
+            ]
+        })
+        .skip(skip)
+        .limit(parseInt(limit));
+
+        const total = await Employees.countDocuments({
+            userId: { $in: userIds },
+            $or: [
+                { firstName: regex },
+                { lastName: regex },
+                { email: regex }
+            ]
         });
-    }catch(error){  
-        return res.status(500).json({message:error});
+
+        return res.status(200).json({
+            success: true,
+            message: 'Employee data retrieved successfully',
+            currentPage: parseInt(page),
+            totalPages: Math.ceil(total / limit),
+            totalRecords: total,
+            data: employees,
+        });
+    } catch (error) {
+        return res.status(500).json({ message: error.message || 'Server error' });
     }
 
 }

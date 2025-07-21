@@ -53,6 +53,13 @@ const OrganizationSchema = new mongoose.Schema({
         minLength: 2,
         maxLength: 100,
     },
+    country:{
+        type: String,
+        required: [true, 'country is required'],
+        trim: true,
+        minLength: 2,
+        maxLength: 100,
+    },
     zipCode:{
         type: String,
         required: [true, 'Zip Code is required'],
@@ -89,11 +96,21 @@ const OrganizationSchema = new mongoose.Schema({
         trim: true,
         maxLength: 100,
     },  
+    taxMethod:{
+        type: String,
+        trim: true,
+        maxLength: 100,
+    },
     taxID:{
         type: String,
         required: [true, 'Tax ID is required'],
         trim: true,
         maxLength: 100,
+    },
+    dateFormat:{
+        type: String,
+        trim: true,
+        maxLength: 50,
     },
     companyID:{
         type: String,
