@@ -51,16 +51,15 @@ export const onboardEmployee = async (req, res)  => {
         if(existingEmployee){
             return res.status(400).json({message: 'Employee already onboarded with this ID'});
         }
+        const existingUser=await User.findOne({email});
+        console.log(existingEmployee);
+        if(existingUser){
+            return res.status(400).json({message:'User already exist with the same email'})
+        }
         
         const password =employeeId; 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-
-        const existingUser= Employees.find({email});
-
-        if(existingUser){
-            return res.status(400).json({message:'User already exist with the same email'})
-        }
 
         const newUser = new User({
             name: employeeId,

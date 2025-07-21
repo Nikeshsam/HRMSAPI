@@ -61,6 +61,7 @@ const employeeSchema = new mongoose.Schema({
     joiningDate:{
         type: Date,
         required: true
+        
     },
     offerLetter: {
         base64: String,
