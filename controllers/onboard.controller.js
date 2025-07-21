@@ -22,6 +22,16 @@ export const onboardEmployee = async (req, res)  => {
         employeeType
     } = req.body;
     
+    const file = req.file;
+    let offerLetter = null;
+
+    if (file) {
+        offerLetter = {
+        base64: file.buffer.toString('base64'),
+        contentType: file.mimetype,
+        };
+    }
+
     const user = req.user;
     
     if (!user || !user.company) {
@@ -199,35 +209,56 @@ export const deleteEmployee = async(req,res) =>{
 
 export const searchEmployees = async (req, res) => {
     const user = req.user;
-    const {searchTerm} = req.body;
-    const company = user.company;
-    if(!user || !user.company && user.role !=='admin'){
-        return res.status(401).json({message:'Unauthorized'})
-    }
-    try{
-        const users= await User.find({company}).select('_id'); // Fetching only user IDs for employees in the company
-        if (!users || users.length === 0) {
-            return res.status(404).json({message:'No employees found for this company'});
-        }
-        const userIds = users.map(user => user._id);
-        const employees = await Employees.find({userId: {$in: userIds}});
-        const filteredEmployees = employees.filter(employee => {
-            return (
-                employee.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                employee.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                employee.email.toLowerCase().includes(searchTerm.toLowerCase()) 
-            )
-        })
-        return res.status(200).json({
-            success:true,
-            message:'Employee data retrieved successfully',
-            data:filteredEmployees,
-        });
-    }catch(error){  
-        return res.status(500).json({message:error});
+    const { searchTerm = '', page = 1, limit = 10 } = req.query;
+    const company = user?.company;
+
+    if (!user || (!company && user.role !== 'admin')) {
+        return res.status(401).json({ message: 'Unauthorized' });
     }
 
-}
+    try {
+        const users = await User.find({ company }).select('_id');
+        if (!users.length) {
+            return res.status(404).json({ message: 'No employees found for this company' });
+        }
+
+        const userIds = users.map(user => user._id);
+
+        const regex = new RegExp(searchTerm, 'i');
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+
+        const employees = await Employees.find({
+            userId: { $in: userIds },
+            $or: [
+                { firstName: regex },
+                { lastName: regex },
+                { email: regex }
+            ]
+        })
+        .skip(skip)
+        .limit(parseInt(limit));
+
+        const total = await Employees.countDocuments({
+            userId: { $in: userIds },
+            $or: [
+                { firstName: regex },
+                { lastName: regex },
+                { email: regex }
+            ]
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: 'Employee data retrieved successfully',
+            currentPage: parseInt(page),
+            totalPages: Math.ceil(total / limit),
+            totalRecords: total,
+            data: employees,
+        });
+    } catch (error) {
+        return res.status(500).json({ message: error.message || 'Server error' });
+    }
+};
 
 
 export const exportEmployeesExcel = async (req, res) => {
@@ -242,8 +273,27 @@ export const exportEmployeesExcel = async (req, res) => {
             return res.status(404).json({message:'No employees found for this company'});
         }
         const userIds = users.map(user => user._id);
-        const employees = await Employees.find({userId: {$in: userIds}},'employeeId firstName lastName email phoneNumber department designation workLocation employmentType joiningDate status -_id').lean();
-        const excelBuffer = generateExcelFromJSON(employees);
+        const employees = await Employees.find(
+            { userId: { $in: userIds } },
+            'employeeId firstName lastName email phoneNumber department designation workLocation employmentType joiningDate status -_id'
+        ).lean();
+
+        // Map keys to desired column names with spaces
+        const mappedEmployees = employees.map(emp => ({
+            'Employee Id': emp.employeeId,
+            'First Name': emp.firstName,
+            'Last Name': emp.lastName,
+            'Email': emp.email,
+            'Phone Number': emp.phoneNumber,
+            'Department': emp.department,
+            'Designation': emp.designation,
+            'Work Location': emp.workLocation,
+            'Employment Type': emp.employmentType,
+            'Joining Date': emp.joiningDate,
+            'Status': emp.status
+        }));
+
+        const excelBuffer = generateExcelFromJSON(mappedEmployees);
         
         res.setHeader('Content-Disposition', 'attachment; filename=EmployeeData.xlsx');
         res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
