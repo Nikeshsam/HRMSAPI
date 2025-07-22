@@ -9,7 +9,7 @@ const genOnboardEmailTemplate = (employee) =>  `
 
       <p><strong>please find the below link to loging to our system and onboard:</strong></p>
       <ul>
-        <li>URL: ${employee.email}</li>
+        <li>URL: ${FRONTEND_URL}</li>
         <li>Email: ${employee.email}</li>
         <li>password: ${employee.email}</li>
       </ul>

@@ -57,14 +57,12 @@ export const registerCompany = async (req, res) => {
 
 export const signIn = async (req, res) => {
     const { email, password } = req.body;
-    console.log(email, password);
     if (!email || !password) {
         return res.status(400).json({ message: "Email and password are required" });
     }
 
     try {
         const user = await User.findOne({ email });
-        console.log(user);
         if (!user) {
             return res.status(401).json({ message: "Invalid email or password" });
         }
