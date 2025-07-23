@@ -250,15 +250,29 @@ export const updateEmployee = async(req,res) => {
 }
 
 export const deleteEmployee = async(req,res) =>{
+    const session = await mongoose.startSession();
+    session.startTransaction();
     const user=req.user;
     const {id} = req.params;
     if(!user){
         return res.status(401).json({message:'UnAuthorized'})
     }
     try{
-        await Employees.findByIdAndDelete(id);
+        const emp = await Employees.findOne({_id:id});
+        if(!emp){
+            await session.abortTransaction();
+            await session.endSession();
+            return res.status(404).json({message:'Employee with the id not found'});
+        }
+        const empUserId = emp.userId._id;
+        await Employees.findByIdAndDelete(id,{session});
+        await User.findByIdAndDelete({_id:empUserId},{session});
+        await session.commitTransaction();
+        await session.endSession();
         res.status(200).json({message:'Employee deleted Successfully'});
     }catch(error){
+        await session.abortTransaction();
+        await session.endSession();
         return res.status(500).json({message:'server error during delete employee'});
     }
 }
