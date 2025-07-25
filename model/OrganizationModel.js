@@ -13,6 +13,10 @@ const OrganizationSchema = new mongoose.Schema({
         minLength: 2,
         maxLength: 100,
     },
+    companyLogo: {
+        base64: String,
+        contentType: String,
+    },
     industry:{
         type: String,
         required: [true, 'Industry is required'],
