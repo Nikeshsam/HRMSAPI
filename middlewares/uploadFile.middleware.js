@@ -5,7 +5,7 @@ const storage = multer.memoryStorage();
 
 export const createUploadMiddleware = ({
   fieldName,
-  multiple,
+  multiple = false,
   maxCount = 1,
   fileSize = 5, // default to 5MB
   fileType //optional
