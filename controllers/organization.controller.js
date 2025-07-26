@@ -114,14 +114,19 @@ export const getOrganizationDetails = async (req, res) => {
         if (!organization) {
             return res.status(404).json({ message: 'Organization not found' });
         }
-        const companyLogoBase64 = organization.companyLogo ? organization.companyLogo.base64.toString() : null;
+        let companyLogoBase64 ;
+        if(organization.companyLogo){
+            companyLogoBase64 = organization.companyLogo.base64.toString();
+        }else{
+            companyLogoBase64=null;
+        }
 
         return res.status(200).json({
-            success:true,
+            success: true,
             message: 'Organization details retrieved successfully',
             organization: {
-                ...organization.toObject(),
-                companyLogo:companyLogoBase64
+            ...organization.toObject(),
+            companyLogo: companyLogoBase64
             }
         });
     } catch (error) {
