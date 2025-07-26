@@ -116,7 +116,7 @@ export const getOrganizationDetails = async (req, res) => {
         }
         let companyLogoBase64 ;
         if(organization.companyLogo){
-            companyLogoBase64 = organization.companyLogo.base64.toString();
+            companyLogoBase64 = organization.companyLogo.base64;
         }else{
             companyLogoBase64=null;
         }
