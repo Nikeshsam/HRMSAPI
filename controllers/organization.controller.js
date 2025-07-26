@@ -133,3 +133,99 @@ export const getOrganizationDetails = async (req, res) => {
         return res.status(500).json({ error: error.message });
     }
 }
+
+
+export const updateOrganizationDetails = async (req, res) => {
+
+    const session = await mongoose.startSession();
+
+    session.startTransaction();
+
+    const {
+        organizationName,
+        industry,
+        businessType,
+        companyAddress,
+        street,
+        city,
+        state,
+        country,
+        zipCode,
+        phoneNumber,
+        faxNumber,
+        website,
+        fiscal,
+        timeZone,
+        taxID,
+        taxMethod,
+        dateFormat,
+        companyID
+    } = req.body;
+    
+    const user = req.user;
+    const file = req.file;
+    const id = req.params;
+    let companyLogo = null;
+
+    if(file){
+        companyLogo = {
+            base64: file.buffer.toString('base64'),
+            contentType: file.mimetype,
+        };
+    }
+
+    if (!user || !user.company) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    const company = user.company; 
+   
+    const requiredFields = [
+        organizationName, industry, businessType, companyAddress, street,
+        city, state, zipCode, phoneNumber, faxNumber, website, fiscal,
+        timeZone, taxID
+    ];
+
+    if (requiredFields.some(field=>!field)){
+         return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    try {
+          const updatedData = {
+            company,
+            organizationName,
+            companyLogo,
+            industry,
+            businessType,
+            companyAddress,
+            street,
+            city,
+            state,
+            country,
+            zipCode,
+            phoneNumber,
+            faxNumber,
+            website,
+            fiscal,
+            timeZone,
+            taxID,
+            taxMethod,
+            dateFormat,
+            companyID
+        };
+        await Organization.findByIdAndUpdate(id,updatedData,{new:true,session});
+
+        await session.commitTransaction();
+        
+        return res.status(201).json({ message: 'Organization details Updated successfully'});
+
+    } catch (error) {
+        await session.abortTransaction();
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({ message: 'Validation error', errors: error.errors });
+        }
+        return res.status(500).json({ error: error.message });
+    } finally{
+        session.endSession();
+    }
+}
