@@ -30,6 +30,16 @@ export const insertOrganizationDetails = async (req, res) => {
     } = req.body;
     
     const user = req.user;
+    const file = req.file;
+
+    let companyLogo = null;
+
+    if(file){
+        companyLogo = {
+            base64: file.buffer.toString('base64'),
+            contentType: file.mimetype,
+        };
+    }
 
     if (!user || !user.company) {
         return res.status(401).json({ message: 'Unauthorized' });
@@ -50,6 +60,7 @@ export const insertOrganizationDetails = async (req, res) => {
         const newOrganization = new Organization({
             company,
             organizationName,
+            companyLogo,
             industry,
             businessType,
             companyAddress,
@@ -103,10 +114,15 @@ export const getOrganizationDetails = async (req, res) => {
         if (!organization) {
             return res.status(404).json({ message: 'Organization not found' });
         }
+        const companyLogoBase64 = organization.companyLogo ? organization.companyLogo.base64.toString() : null;
+
         return res.status(200).json({
             success:true,
             message: 'Organization details retrieved successfully',
-            organization: organization
+            organization: {
+                ...organization.toObject(),
+                companyLogo:companyLogoBase64
+            }
         });
     } catch (error) {
         return res.status(500).json({ error: error.message });
