@@ -164,7 +164,7 @@ export const updateOrganizationDetails = async (req, res) => {
     
     const user = req.user;
     const file = req.file;
-    const id = req.params;
+    const {id} = req.params;
     let companyLogo = null;
 
     if(file){
