@@ -31,6 +31,7 @@ export const onboardEmployee = async (req, res)  => {
         offerLetter = {
         base64: file.buffer.toString('base64'),
         contentType: file.mimetype,
+        fileName:file.originalname,
         };
     }
 
