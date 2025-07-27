@@ -38,6 +38,7 @@ export const insertOrganizationDetails = async (req, res) => {
         companyLogo = {
             base64: file.buffer.toString('base64'),
             contentType: file.mimetype,
+            fileName:file.originalname,
         };
     }
 
@@ -168,9 +169,11 @@ export const updateOrganizationDetails = async (req, res) => {
     let companyLogo = null;
 
     if(file){
+        console.log(file);
         companyLogo = {
             base64: file.buffer.toString('base64'),
             contentType: file.mimetype,
+            fileName:file.originalname,
         };
     }
 
@@ -191,10 +194,9 @@ export const updateOrganizationDetails = async (req, res) => {
     }
 
     try {
-          const updatedData = {
+        const updatedData = {
             company,
             organizationName,
-            companyLogo,
             industry,
             businessType,
             companyAddress,
@@ -213,6 +215,9 @@ export const updateOrganizationDetails = async (req, res) => {
             dateFormat,
             companyID
         };
+        if (companyLogo) {
+            updatedData.companyLogo = companyLogo;
+        }
         await Organization.findByIdAndUpdate(id,updatedData,{new:true,session});
 
         await session.commitTransaction();

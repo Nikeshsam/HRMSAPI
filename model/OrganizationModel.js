@@ -16,6 +16,7 @@ const OrganizationSchema = new mongoose.Schema({
     companyLogo: {
         base64: String,
         contentType: String,
+        fileName:String,
     },
     industry:{
         type: String,
