@@ -12,7 +12,7 @@ onboardRouter.post("/",authorize,createUploadMiddleware({
 onboardRouter.get("/",authorize,getEmployees); 
 
 onboardRouter.get("/search",searchEmployees);
-onboardRouter.get("/report",authorize, exportEmployeesExcel);
+onboardRouter.get("/export",authorize, exportEmployeesExcel);
 
 onboardRouter.put("/:id",authorize,updateEmployee);
 onboardRouter.get("/:id",authorize,getEmployee);
