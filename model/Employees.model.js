@@ -65,6 +65,7 @@ const employeeSchema = new mongoose.Schema({
     offerLetter: {
         base64: String,
         contentType: String,
+        fileName:String,
     },
     status:{
         type: String,
