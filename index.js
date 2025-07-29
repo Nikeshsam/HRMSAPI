@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
-import serverless from 'serverless-http';
 
 import { PORT } from './config/config.js';
 import connectToDatabase from './database/mongodb.js';
@@ -28,21 +27,23 @@ app.use('/api/v1/organization', organizationRouter);
 app.use('/api/v1/employee', onboardRouter);
 app.use('/api/v1/employeeBasic', employeeBasicRouter);
 
-// Optional root route for testing
+// Root route
 app.get('/api/', (req, res) => {
   res.send("API is live ✅");
 });
 
-// Ensure DB connects only once (Vercel cold start safe)
-let isConnected = false;
-app.use(async (req, res, next) => {
-  if (!isConnected) {
+const startServer = async () => {
+  try {
     await connectToDatabase();
-    isConnected = true;
     console.log("Connected to database (production mode)");
-  }
-  next();
-});
 
-// ✅ THIS IS THE CORRECT EXPORT FOR VERCEL
-export default serverless(app);
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error("❌ Failed to connect to database", error);
+    process.exit(1);
+  }
+};
+
+startServer();
