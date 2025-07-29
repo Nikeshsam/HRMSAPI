@@ -123,7 +123,7 @@ export const onboardEmployee = async (req, res)  => {
 
 export const getEmployees = async (req, res) => {
      const user = req.user;
-    const { searchTerm = '', page = 1, limit = 10 } = req.query;
+    const { searchTerm = '', page = 1, limit = 10, position = '', department = '', status = ''  } = req.query;
     const company = user?.company;
 
     if (!user || (!company && user.role !== 'admin')) {
@@ -131,7 +131,7 @@ export const getEmployees = async (req, res) => {
     }
 
     try {
-        const users = await User.find({ company }).select('_id');
+        const users = await User.find({ company }).select('_id').lean();
         if (!users.length) {
             return res.status(404).json({ message: 'No employees found for this company' });
         }
@@ -139,27 +139,54 @@ export const getEmployees = async (req, res) => {
         const userIds = users.map(user => user._id);
 
         const regex = new RegExp(searchTerm, 'i');
+        
+
+        const filter = {
+            userId: { $in: userIds },
+            ...(searchTerm && {
+              $or: [
+                { firstName: regex },
+                { lastName: regex },
+                { email: regex }
+              ]
+            }),
+            ...(position && { designation: position }),
+            ...(department && { department }),
+            ...(status && { status }),
+          };
+      
         const skip = (parseInt(page) - 1) * parseInt(limit);
+        const parsedLimit = parseInt(limit);
 
-        const employees = await Employees.find({
-            userId: { $in: userIds },
-            $or: [
-                { firstName: regex },
-                { lastName: regex },
-                { email: regex }
-            ]
-        })
-        .skip(skip)
-        .limit(parseInt(limit));
+        const [employees, total] = await Promise.all([
+            Employees.find(filter).skip(skip).limit(parsedLimit).lean(),
+            Employees.countDocuments(filter),
+          ]);
+      
+        // const employees = await Employees.find({
+        //     userId: { $in: userIds },
+        //     $or: [
+        //         { firstName: regex },
+        //         { lastName: regex },
+        //         { email: regex },
+        //     ],
+        //     $and: [
+        //         position ? { designation: position } : {},
+        //         department ? { department } : {},
+        //         status ? { status } : {}
+        //     ]
+        // })
+        // .skip(skip)
+        // .limit(parseInt(limit));
 
-        const total = await Employees.countDocuments({
-            userId: { $in: userIds },
-            $or: [
-                { firstName: regex },
-                { lastName: regex },
-                { email: regex }
-            ]
-        });
+        // const total = await Employees.countDocuments({
+        //     userId: { $in: userIds },
+        //     $or: [
+        //         { firstName: regex },
+        //         { lastName: regex },
+        //         { email: regex }
+        //     ]
+        // });
 
         return res.status(200).json({
             success: true,
@@ -277,60 +304,6 @@ export const deleteEmployee = async(req,res) =>{
         return res.status(500).json({message:'server error during delete employee'});
     }
 }
-
-export const searchEmployees = async (req, res) => {
-    const user = req.user;
-    const { searchTerm = '', page = 1, limit = 10 } = req.query;
-    const company = user?.company;
-
-    if (!user || (!company && user.role !== 'admin')) {
-        return res.status(401).json({ message: 'Unauthorized' });
-    }
-
-    try {
-        const users = await User.find({ company }).select('_id');
-        if (!users.length) {
-            return res.status(404).json({ message: 'No employees found for this company' });
-        }
-
-        const userIds = users.map(user => user._id);
-
-        const regex = new RegExp(searchTerm, 'i');
-        const skip = (parseInt(page) - 1) * parseInt(limit);
-
-        const employees = await Employees.find({
-            userId: { $in: userIds },
-            $or: [
-                { firstName: regex },
-                { lastName: regex },
-                { email: regex }
-            ]
-        })
-        .skip(skip)
-        .limit(parseInt(limit));
-
-        const total = await Employees.countDocuments({
-            userId: { $in: userIds },
-            $or: [
-                { firstName: regex },
-                { lastName: regex },
-                { email: regex }
-            ]
-        });
-
-        return res.status(200).json({
-            success: true,
-            message: 'Employee data retrieved successfully',
-            currentPage: parseInt(page),
-            totalPages: Math.ceil(total / limit),
-            totalRecords: total,
-            data: employees,
-        });
-    } catch (error) {
-        return res.status(500).json({ message: error.message || 'Server error' });
-    }
-};
-
 
 export const exportEmployeesExcel = async (req, res) => {
     const user = req.user;
