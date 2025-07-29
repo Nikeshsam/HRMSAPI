@@ -308,7 +308,7 @@ export const deleteEmployee = async(req,res) =>{
 export const exportEmployeesExcel = async (req, res) => {
     const user = req.user;
     const company = user.company;
-    if(!user || !user.company && user.role !=='admin'){
+    if(!user || user.role !=='admin'){
         return res.status(401).json({message:'Unauthorized'})
     }
     try{
