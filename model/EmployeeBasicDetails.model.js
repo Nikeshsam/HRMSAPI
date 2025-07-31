@@ -45,7 +45,7 @@ const employeeBasicDetailsSchema = new mongoose.Schema({
         type: Date,
         required: false
     }
-});
+},{timestamps: true});
 
 
 const EmployeeBasicDetails = mongoose.model('EmployeeBasicDetails', employeeBasicDetailsSchema);

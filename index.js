@@ -9,7 +9,7 @@ import connectToDatabase from './database/mongodb.js';
 import authRouter from './routes/auth.router.js';
 import organizationRouter from './routes/organization.router.js';
 import onboardRouter from './routes/onboard.router.js';
-import employeeBasicRouter from './routes/employeeBasic.router.js';
+import employeeDetailsRouter from './routes/employeeDetails.router.js';
 
 const app = express();
 
@@ -25,7 +25,7 @@ app.use(cookieParser());
 app.use('/api/v1/authentication', authRouter);
 app.use('/api/v1/organization', organizationRouter);
 app.use('/api/v1/employee', onboardRouter);
-app.use('/api/v1/employeeBasic', employeeBasicRouter);
+app.use('/api/v1/employeeDetails', employeeDetailsRouter);
 
 // Root route
 app.get('/api/', (req, res) => {
@@ -35,7 +35,6 @@ app.get('/api/', (req, res) => {
 const startServer = async () => {
   try {
     await connectToDatabase();
-    console.log("Connected to database (production mode)");
 
     app.listen(PORT, () => {
       console.log(`🚀 Server running on http://localhost:${PORT}`);
