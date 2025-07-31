@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const EducationDetilasSchema = new mongoose.Schema({
+const EducationDetailsSchema = new mongoose.Schema({
     employee:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'Employees',
@@ -30,6 +30,6 @@ const EducationDetilasSchema = new mongoose.Schema({
     }
 },{timestamps: true});
 
-const EmployeeEducationDetails = mongoose.Model('EmployeeEducationDetails',EducationDetilasSchema);
+const EmployeeEducationDetails = mongoose.model('EmployeeEducationDetails',EducationDetailsSchema);
 
 export default EmployeeEducationDetails;
