@@ -8,7 +8,7 @@ export const createOrUpdateDependentDetails = async (req, res) => {
 
   const user = req.user;
   const {
-    name, // previously dependentName
+    name,
     relationship,
     dateOfBirth,
     education,
@@ -57,12 +57,13 @@ export const createOrUpdateDependentDetails = async (req, res) => {
       });
       await dependentDetails.validate();
       await dependentDetails.save({ session });
+      dependentDetails.wasNew = true;
     }
 
     await session.commitTransaction();
     await session.endSession();
 
-    return res.status(201).json({
+    return res.status(dependentDetails.isNew?201:200).json({
       message: dependentDetails.isNew
         ? 'Dependent details created successfully'
         : 'Dependent details updated successfully',
@@ -77,18 +78,14 @@ export const createOrUpdateDependentDetails = async (req, res) => {
 
 export const getDependentDetails = async (req, res) => {
   const user = req.user;
-  const { id } = req.params;
 
   if (!user) {
     return res.status(401).json({ message: 'Unauthorized access' });
   }
 
   try {
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: 'Invalid employee ID' });
-    }
 
-    const employee = await Employees.findById(id);
+    const employee = await Employees.findOne({userId: user});
 
     if (!employee) {
       return res.status(404).json({ message: 'Employee not found' });
