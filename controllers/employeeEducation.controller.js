@@ -48,12 +48,13 @@ export const createOrUpdateEducationDetails = async (req, res) => {
       });
       await educationRecord.validate();
       await educationRecord.save({ session });
+      educationRecord.wasNew=true;
     }
 
     await session.commitTransaction();
     session.endSession();
 
-    return res.status(201).json({
+    return res.status(educationRecord.isNew?201:200).json({
       message: educationRecord.isNew
         ? 'Education details created successfully'
         : 'Education details updated successfully',
@@ -68,24 +69,20 @@ export const createOrUpdateEducationDetails = async (req, res) => {
 
 export const getEducationDetails = async (req, res) => {
   const user = req.user;
-  const { id } = req.params;
 
   if (!user) {
     return res.status(401).json({ message: 'Unauthorized access' });
   }
 
   try {
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: 'Invalid employee ID' });
-    }
 
-    const employee = await Employees.findById(id);
+    const employee = await Employees.findOne({userId: user});
 
     if (!employee) {
       return res.status(404).json({ message: 'Employee not found' });
     }
 
-    const educationRecords = await EmployeeEducationDetails.find({ employee }).populate('employee');
+    const educationRecords = await EmployeeEducationDetails.find({ employee });
 
     if (!educationRecords || educationRecords.length === 0) {
       return res.status(404).json({ message: 'No education details found' });

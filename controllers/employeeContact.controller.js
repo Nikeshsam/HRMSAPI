@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import Employees from "../model/Employees.model";
-import EmployeeContactDetails from "../model/EmployeeContact.model";
+import Employees from "../model/Employees.model.js";
+import EmployeeContactDetails from "../model/EmployeeContact.model.js";
 
 
 
@@ -74,13 +74,14 @@ export const createOrUpdateEmployeeContactDetails = async (req, res) => {
             });
 
             await contactDetails.validate();
-            await contactDetails.save({ session });
+            await contactDetails.save({ session});
+            contactDetails.wasNew = true;
         }
-
+        console.log(contactDetails.wasNew);
         await session.commitTransaction();
         session.endSession();
 
-        return res.status(201).json({
+        return res.status(contactDetails.wasNew?201:200).json({
             message: contactDetails.wasNew
                 ? 'Employee contact details created successfully'
                 : 'Employee contact details updated successfully',
@@ -96,23 +97,19 @@ export const createOrUpdateEmployeeContactDetails = async (req, res) => {
 
 export const getEmployeeContactDetails = async (req, res) => {
     const user = req.user;
-    const { id } = req.params;
 
     if (!user) {
         return res.status(401).json({ message: 'Unauthorized access' });
     }
 
     try {
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ message: 'Invalid employee ID' });
-        }
 
-        const employee = await Employees.findById(id);
+        const employee = await Employees.findOne({userId:user});
         if (!employee) {
             return res.status(404).json({ message: 'Employee not found' });
         }
 
-        const contactDetails = await EmployeeContactDetails.findOne({ employee: employee._id }).populate('employee');
+        const contactDetails = await EmployeeContactDetails.findOne({ employee: employee._id });
         if (!contactDetails) {
             return res.status(404).json({ message: 'Employee contact details not found' });
         }

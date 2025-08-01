@@ -1,7 +1,7 @@
 import {Router} from 'express';
 import authorize from '../middlewares/auth.middleware.js';
 import { createOrUpdateEmployeeBasicDetails, getEmployeeBasicDetails } from '../controllers/employeeBasic.controller.js';
-import { createOrUpdateEmployeeContactDetails, getEmployeeContactDetails } from '../controllers/employeeBasic.controller.js';
+import { createOrUpdateEmployeeContactDetails, getEmployeeContactDetails } from '../controllers/employeeContact.controller.js';
 import { createOrUpdateDependentDetails, getDependentDetails } from '../controllers/employeeDependent.controller.js';
 import { createOrUpdateEducationDetails, getEducationDetails } from '../controllers/employeeEducation.controller.js';
 const employeeDetailsRouter = Router();
