@@ -37,3 +37,4 @@ coverage/
 # Miscellaneous
 *.swp
 *.swo
+.vercel
