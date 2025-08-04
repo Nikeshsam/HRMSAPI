@@ -4,6 +4,7 @@ import { createOrUpdateEmployeeBasicDetails, getEmployeeBasicDetails } from '../
 import { createOrUpdateEmployeeContactDetails, getEmployeeContactDetails } from '../controllers/employeeContact.controller.js';
 import { createOrUpdateDependentDetails, getDependentDetails } from '../controllers/employeeDependent.controller.js';
 import { createOrUpdateEducationDetails, getEducationDetails } from '../controllers/employeeEducation.controller.js';
+import { createOrUpdateEmployeeCertificationDetails, getEmployeeCertification } from '../controllers/employeeCertification.controller.js';
 const employeeDetailsRouter = Router();
 
 
@@ -11,7 +12,7 @@ employeeDetailsRouter.post('/basic-details',authorize,createOrUpdateEmployeeBasi
 employeeDetailsRouter.post('/contact-details',authorize,createOrUpdateEmployeeContactDetails);
 employeeDetailsRouter.post('/dependents',authorize,createOrUpdateDependentDetails);
 employeeDetailsRouter.post('/education-details',authorize,createOrUpdateEducationDetails);
-
+employeeDetailsRouter.post('/certification', authorize, createOrUpdateEmployeeCertificationDetails);
 
 
 
@@ -19,7 +20,7 @@ employeeDetailsRouter.get('/basic-details',authorize,getEmployeeBasicDetails);
 employeeDetailsRouter.get('/contact-details',authorize,getEmployeeContactDetails);
 employeeDetailsRouter.get('/dependents',authorize,getDependentDetails);
 employeeDetailsRouter.get('/education-details',authorize,getEducationDetails);
-
+employeeDetailsRouter.get('/certification', authorize, getEmployeeCertification);
 
 
 employeeDetailsRouter.get('/basic',authorize,getEmployeeBasicDetails);
