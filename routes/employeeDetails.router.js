@@ -2,9 +2,9 @@ import {Router} from 'express';
 import authorize from '../middlewares/auth.middleware.js';
 import { createOrUpdateEmployeeBasicDetails, getEmployeeBasicDetails } from '../controllers/employeeBasic.controller.js';
 import { createOrUpdateEmployeeContactDetails, getEmployeeContactDetails } from '../controllers/employeeContact.controller.js';
-import { createOrUpdateDependentDetails, getDependentDetails } from '../controllers/employeeDependent.controller.js';
-import { createOrUpdateEducationDetails, getEducationDetails } from '../controllers/employeeEducation.controller.js';
-import { createOrUpdateEmployeeCertificationDetails, getEmployeeCertification } from '../controllers/employeeCertification.controller.js';
+import { createOrUpdateDependentDetails, deleteDependent, getDependentDetails } from '../controllers/employeeDependent.controller.js';
+import { createOrUpdateEducationDetails, deleteEmployeeEducation, getEducationDetails } from '../controllers/employeeEducation.controller.js';
+import { createOrUpdateEmployeeCertificationDetails, deleteEmployeeCertification, getEmployeeCertification } from '../controllers/employeeCertification.controller.js';
 const employeeDetailsRouter = Router();
 
 
@@ -25,4 +25,7 @@ employeeDetailsRouter.get('/certification', authorize, getEmployeeCertification)
 
 employeeDetailsRouter.get('/basic',authorize,getEmployeeBasicDetails);
 
+employeeDetailsRouter.delete('/dependents/:id',authorize,deleteDependent);
+employeeDetailsRouter.delete('/education-details/:id',authorize,deleteEmployeeEducation);
+employeeDetailsRouter.delete('/certification/:id', authorize, deleteEmployeeCertification);
 export default employeeDetailsRouter;
