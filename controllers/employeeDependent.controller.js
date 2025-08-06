@@ -147,7 +147,7 @@ export const deleteDependent = async (req,res) => {
     return res.status(400).json({ message:'Invalid dependent ID'});
   }
 
-  const dependent = await EmployeeDependentDetails.findOneAndDelete({ _id: id}, { session });
+  const dependent = await EmployeeDependentDetails.findOneAndDelete({ _id: id});
 
   if (!dependent) {
     return res.status(404).json({ message: 'Dependent not found or does not belong to this employee' });
