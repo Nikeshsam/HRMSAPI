@@ -32,7 +32,6 @@ const authorize=async (req, res, next) => {
             error:error.message,
             message:'Unauthorized',
         });
-        next(error);
     }
 }
 
