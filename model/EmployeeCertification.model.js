@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 
 
 const employeeCertificationSchema = new mongoose.Schema({
+    employee:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Employees',
+        required: true
+    },
     name:{
         type:String,
         trim:true,

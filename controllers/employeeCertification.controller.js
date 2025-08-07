@@ -118,7 +118,7 @@ export const getEmployeeCertification = async (req, res) => {
         }
 
         // Fetch employee's certification details
-        const employeeCertification = await EmployeeCertification.findOne({ employee: employee._id }).populate('employee');
+        const employeeCertification = await EmployeeCertification.findOne({ employee: employee._id });
 
         if (!employeeCertification) {
             return res.status(404).json({ message: 'Employee certification details not found' });
@@ -147,7 +147,7 @@ export const deleteEmployeeCertification = async(req, res) => {
             return res.status(400).json({ message: 'Invalid certification ID' });
         }
 
-        const employeeCertification = await EmployeeCertification.findOneAndDelete({ _id: id}, { session });
+        const employeeCertification = await EmployeeCertification.findOneAndDelete({ _id: id});
         if (!employeeCertification) {
         return res.status(404).json({ message: 'Employee certification not found or does not belong to this employee' });
         }

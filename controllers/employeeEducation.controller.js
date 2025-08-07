@@ -124,7 +124,7 @@ export const deleteEmployeeEducation = async(req, res) => {
     return res.status(401).json({message:'Unauthorized access'});
   }
   try{
-    const employeeEducation = await EmployeeEducationDetails.findOneAndDelete({_id:id},{session});
+    const employeeEducation = await EmployeeEducationDetails.findOneAndDelete({_id:id});
     if(!employeeEducation){
       return res.status(404).json({message:'Education Details Not Found'});
     }
