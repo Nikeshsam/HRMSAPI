@@ -8,6 +8,7 @@ import { createOrUpdateEmployeeCertificationDetails, deleteEmployeeCertification
 import { createOrUpdateEmployeeExperienceDetails, getEmployeeExperienceDetails, deleteEmployeeExperience } from '../controllers/employeeExperience.controller.js';
 import { createOrUpdateEmployeeBenefits, deleteEmployeeBenefit, getEmployeeBenefits } from '../controllers/employeeBenefits.controller.js';
 import { createOrUpdateEmployeeHealthRecord, deleteEmployeeVaccinationRecord, getEmployeeHealthRecord } from '../controllers/employeeHealthRecord.controller.js';
+import { createOrUpdateEmployeeTravelDetails, deleteEmployeeVisaDetails, getEmployeeTravelRecord } from '../controllers/employeeTravelDetails.controller.js';
 const employeeDetailsRouter = Router();
 
 
@@ -19,6 +20,7 @@ employeeDetailsRouter.post('/certification', authorize, createOrUpdateEmployeeCe
 employeeDetailsRouter.post('/experience', authorize, createOrUpdateEmployeeExperienceDetails);
 employeeDetailsRouter.post('/benefits', authorize, createOrUpdateEmployeeBenefits);
 employeeDetailsRouter.post('/health-record', authorize, createOrUpdateEmployeeHealthRecord);
+employeeDetailsRouter.post('/travel-record', authorize, createOrUpdateEmployeeTravelDetails);
 
 
 employeeDetailsRouter.get('/basic-details',authorize,getEmployeeBasicDetails);
@@ -29,6 +31,7 @@ employeeDetailsRouter.get('/certification', authorize, getEmployeeCertification)
 employeeDetailsRouter.get('/experience', authorize, getEmployeeExperienceDetails);
 employeeDetailsRouter.get('/benefits', authorize, getEmployeeBenefits);
 employeeDetailsRouter.get('/health-record', authorize, getEmployeeHealthRecord);
+employeeDetailsRouter.get('/travel-record', authorize, getEmployeeTravelRecord);
 
 
 
@@ -40,6 +43,7 @@ employeeDetailsRouter.delete('/certification/:id', authorize, deleteEmployeeCert
 employeeDetailsRouter.delete('/experience/:id', authorize, deleteEmployeeExperience);
 employeeDetailsRouter.delete('/benefits/:id', authorize, deleteEmployeeBenefit);
 employeeDetailsRouter.delete('/health-record/:id', authorize, deleteEmployeeVaccinationRecord);
+employeeDetailsRouter.delete('/travel-record/:id', authorize, deleteEmployeeVisaDetails);
 
 
 export default employeeDetailsRouter;
