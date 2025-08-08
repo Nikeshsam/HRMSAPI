@@ -240,6 +240,7 @@ export const updateEmployee = async(req,res) => {
         joiningDate,
         employeeType
     } = req.body;
+
     const {id} = req.params;
     if(!user || user.role !== 'admin'){
         return res.status(401).json({message:'Unauthorized'});
@@ -273,7 +274,7 @@ export const updateEmployee = async(req,res) => {
     }catch(error){
         await session.abortTransaction();
         session.endSession();
-        return res.status(500).json({message:'server error during update employee details'});
+        return res.status(500).json({message:'server error during update employee details',error});
     }
 }
 
