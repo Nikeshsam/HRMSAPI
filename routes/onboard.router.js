@@ -13,7 +13,10 @@ onboardRouter.get("/",authorize,getEmployees);
 
 onboardRouter.get("/export",authorize, exportEmployeesExcel);
 
-onboardRouter.put("/:id",authorize,updateEmployee);
+onboardRouter.put("/:id",authorize,createUploadMiddleware({
+    fieldName: "offerletter",
+    fileSize: 10,
+}),updateEmployee);
 onboardRouter.get("/:id",authorize,getEmployee);
 onboardRouter.delete("/:id",authorize,deleteEmployee);
 
