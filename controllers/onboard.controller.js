@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import CompanyRegistration from "../model/CompanyRegister.model.js";
 import { sendEmail } from "../utils/send-email.js";
+import Organization from "../model/OrganizationModel.js";
 
 
 export const onboardEmployee = async (req, res)  => {
@@ -242,13 +243,37 @@ export const updateEmployee = async(req,res) => {
     } = req.body;
 
     const {id} = req.params;
+
+    const file = req.file;
+    let offerLetter = null;
+
+    if (file) {
+        offerLetter = {
+        base64: file.buffer.toString('base64'),
+        contentType: file.mimetype,
+        fileName:file.originalname,
+        };
+    }
+
     if(!user || user.role !== 'admin'){
+        await session.abortTransaction();
+        session.endSession();
         return res.status(401).json({message:'Unauthorized'});
     }
+
+    if(!id || !mongoose.isValidObjectId(id)){
+        await session.abortTransaction();
+        session.endSession();
+        return res.status(400).json({message:'Invalid employee ID'});
+    }
+    const existingEmployee = await Employees.findById(id);
+    if(!existingEmployee){
+        await session.abortTransaction();
+        session.endSession();
+        return res.status(404).json({message:'Employee not found'});
+    }
     try{
-        const updatedEmployee = await Employees.findByIdAndUpdate(
-            id,
-            {
+        const updatedEmployee = {
                 employeeId,
                 firstName,
                 lastName,
@@ -260,14 +285,13 @@ export const updateEmployee = async(req,res) => {
                 employmentType,
                 joiningDate,
                 employeeType
-            },
-            { new: true, session } 
-        );
-        if (!updatedEmployee) {
-            await session.abortTransaction();
-            session.endSession();
-            return res.status(404).json({ message: 'Employee not found' });
+            };
+
+        if (offerLetter) {
+            updatedEmployee.offerLetter = offerLetter;
         }
+
+        await Employees.findByIdAndUpdate(id, updatedEmployee, { new: true, session });
         await session.commitTransaction();
         session.endSession();
         return res.status(200).json({message:'Employee Details Updated Successfully'});
