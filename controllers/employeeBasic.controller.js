@@ -13,7 +13,7 @@ export const createOrUpdateEmployeeBasicDetails = async (req, res) => {
         age,
         nationality,
         gender,
-        maritualStatus,
+        maritalStatus,
         dateOfMarriage
     } = req.body;
 
@@ -43,7 +43,7 @@ export const createOrUpdateEmployeeBasicDetails = async (req, res) => {
                 age,
                 nationality,
                 gender,
-                maritualStatus,
+                maritalStatus,
                 dateOfMarriage
             });
 
@@ -59,7 +59,7 @@ export const createOrUpdateEmployeeBasicDetails = async (req, res) => {
                 age,
                 nationality,
                 gender,
-                maritualStatus,
+                maritalStatus,
                 dateOfMarriage
             });
 
