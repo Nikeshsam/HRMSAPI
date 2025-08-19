@@ -36,7 +36,7 @@ const employeeBasicDetailsSchema = new mongoose.Schema({
         type:String,
         require:true
     },
-    maritualStatus:{
+    maritalStatus:{
         type: String,
         enum: ['Single', 'Married', 'Divorced', 'Widowed'],
         required: true
