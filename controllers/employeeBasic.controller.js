@@ -75,8 +75,7 @@ export const createOrUpdateEmployeeBasicDetails = async (req, res) => {
         return res.status(employeeBasicDetails.wasNew?201:200).json({
             message: employeeBasicDetails.wasNew
                 ? 'Employee basic details created successfully'
-                : 'Employee basic details updated successfully',
-            data: employeeBasicDetails
+                : 'Employee basic details updated successfully'
         });
 
     } catch (error) {
