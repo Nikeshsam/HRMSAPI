@@ -34,7 +34,7 @@ const employeeBasicDetailsSchema = new mongoose.Schema({
     },
     gender:{
         type:String,
-        require:true
+        required: true
     },
     maritalStatus:{
         type: String,
