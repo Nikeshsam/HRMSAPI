@@ -11,6 +11,11 @@ const EducationDetailsSchema = new mongoose.Schema({
         required:true,
         trim: true
     },
+    major:{
+        type:String,
+        required:true,
+        trim:true,
+    },
     university:{
         type: String,
         required: true,

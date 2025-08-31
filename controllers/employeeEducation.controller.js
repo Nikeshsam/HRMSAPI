@@ -30,7 +30,7 @@ export const createOrUpdateEducationDetails = async (req, res) => {
     let result = [];
     
     for(const edu of educationDetails){
-      const {_id,degree, university, year, percentage} = edu;
+      const {_id,degree, major, university, year, percentage} = edu;
       let educationRecord;
 
       if (_id && mongoose.isValidObjectId(_id)) {
@@ -41,6 +41,7 @@ export const createOrUpdateEducationDetails = async (req, res) => {
         // Update
         educationRecord.degree = degree;
         educationRecord.university = university;
+        educationRecord.major = major;
         educationRecord.year = year;
         educationRecord.percentage = percentage;
         await educationRecord.save({ session });
@@ -51,6 +52,7 @@ export const createOrUpdateEducationDetails = async (req, res) => {
       // Else -> Create flow with duplicate check
         const duplicate = await EmployeeEducationDetails.findOne({
           degree,
+          major,
           university,
           year,
         });
@@ -64,6 +66,7 @@ export const createOrUpdateEducationDetails = async (req, res) => {
         // Create
         educationRecord = new EmployeeEducationDetails({
           employee: employee._id,
+          major,
           degree,
           university,
           year,
