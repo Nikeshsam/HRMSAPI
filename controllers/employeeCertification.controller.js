@@ -115,7 +115,7 @@ export const getEmployeeCertification = async (req, res) => {
         }
 
         // Fetch employee's certification details
-        const employeeCertification = await EmployeeCertification.findOne({ employee: employee._id });
+        const employeeCertification = await EmployeeCertification.find({ employee: employee._id });
 
         if (!employeeCertification) {
             return res.status(404).json({ message: 'Employee certification details not found' });
