@@ -38,7 +38,6 @@ export const createOrUpdateEmployeeCertificationDetails = async (req, res) => {
                 name,
                 issuedBy,
                 issuedDate,
-                expiryDate,
                 additionalInfo
             } = cert;
 
@@ -52,7 +51,6 @@ export const createOrUpdateEmployeeCertificationDetails = async (req, res) => {
                     name,
                     issuedBy,
                     issuedDate,
-                    expiryDate,
                     additionalInfo
                 });
 
@@ -80,7 +78,6 @@ export const createOrUpdateEmployeeCertificationDetails = async (req, res) => {
                 name,
                 issuedBy,
                 issuedDate,
-                expiryDate,
                 additionalInfo
             });
 

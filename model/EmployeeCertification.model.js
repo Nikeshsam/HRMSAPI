@@ -22,11 +22,6 @@ const employeeCertificationSchema = new mongoose.Schema({
         trim:true,
         required:true
     },
-    expiryDate:{
-        type:Date,
-        trim:true,
-        required:true
-    },
     additionalInfo:{
         type:String,
         trim:true,
