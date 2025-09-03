@@ -22,10 +22,9 @@ const EducationDetailsSchema = new mongoose.Schema({
         trim: true
     },
     year:{
-        type: Number,
+        type: String,
         required: true,
-        min: 1900,
-        max: new Date().getFullYear()
+        max: 20
     },
     percentage:{
         type: Number,
