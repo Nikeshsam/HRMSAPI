@@ -223,6 +223,24 @@ export const getEmployee = async (req, res) => {
 
 }
 
+export const getLoggedEmployee = async (req, res) => {
+    const user = req.user;
+    if(!user || !user.company && user.role !=='admin'){
+        return res.status(401).json({message:'Unauthorized'})
+    }
+    try{
+        const employee = await Employees.findOne({userId:user._id});
+        return res.status(200).json({
+            success:true,
+            message:'Employee data retrieved successfully',
+            data:employee,
+        });
+    }catch(error){  
+        return res.status(500).json({message:error});
+    }
+
+}
+
 
 export const updateEmployee = async(req,res) => {
     const session = await mongoose.startSession();

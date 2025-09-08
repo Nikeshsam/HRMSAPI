@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import { JWT_EXPIRES_IN, JWT_SECRET } from "../config/config.js";
 import CompanyRegistration from "../model/CompanyRegister.model.js";
 import mongoose from "mongoose";
+import Employees from "../model/Employees.model.js";
 
 
 export const registerCompany = async (req, res) => {
@@ -43,8 +44,21 @@ export const registerCompany = async (req, res) => {
             role:"admin",
             company: newCompany._id
         });
-
+        
         await newUser.save({session});
+
+        const employeeId = `EMP${organizationName.slice(0,2).toUpperCase()}001`
+
+        const newEmployee = new Employees({
+            userId: newUser._id,
+            employeeId,
+            firstName: name,
+            email: email,
+            employeeType: 'admin'
+        })
+
+        await newEmployee.save({session});
+        
         await session.commitTransaction();
         session.endSession();
         res.status(201).json({ message: 'Company registered successfully' });

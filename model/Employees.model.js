@@ -20,7 +20,6 @@ const employeeSchema = new mongoose.Schema({
     },
     lastName:{
         type: String,
-        required: true,
         trim: true,
         maxLength: 50
     },
@@ -33,33 +32,27 @@ const employeeSchema = new mongoose.Schema({
     },
     phoneNumber:{
         type: String,
-        required: true,
         match: [/^\d{10}$/, 'Phone number must be 10 digits'],
         trim: true
     },
     department:{
         type: String,
-        required: true,
         trim: true
     },
     designation:{
         type: String,
-        required: true,
         trim: true
     },
     workLocation:{  
         type: String,
-        required: true,
         trim: true
     },
     employmentType:{
         type: String,
-        enum: ['Full Time', 'Part Time', 'Contracted Employee', 'Internship'],
-        required: true
+        enum: ['Full Time', 'Part Time', 'Contracted Employee', 'Internship']
     },
     joiningDate:{
         type: Date,
-        required: true
         
     },
     offerLetter: {

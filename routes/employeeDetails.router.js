@@ -9,6 +9,7 @@ import { createOrUpdateEmployeeExperienceDetails, getEmployeeExperienceDetails, 
 import { createOrUpdateEmployeeBenefits, deleteEmployeeBenefit, getEmployeeBenefits } from '../controllers/employeeBenefits.controller.js';
 import { createOrUpdateEmployeeHealthRecord, deleteEmployeeVaccinationRecord, getEmployeeHealthRecord } from '../controllers/employeeHealthRecord.controller.js';
 import { createOrUpdateEmployeeTravelDetails, deleteEmployeeVisaDetails, getEmployeeTravelRecord } from '../controllers/employeeTravelDetails.controller.js';
+import { getLoggedEmployee } from '../controllers/onboard.controller.js';
 const employeeDetailsRouter = Router();
 
 
@@ -23,6 +24,7 @@ employeeDetailsRouter.post('/health-record', authorize, createOrUpdateEmployeeHe
 employeeDetailsRouter.post('/travel-record', authorize, createOrUpdateEmployeeTravelDetails);
 
 
+employeeDetailsRouter.get('/logged-employee',authorize,getLoggedEmployee);
 employeeDetailsRouter.get('/basic-details',authorize,getEmployeeBasicDetails);
 employeeDetailsRouter.get('/contact-details',authorize,getEmployeeContactDetails);
 employeeDetailsRouter.get('/dependents',authorize,getDependentDetails);
