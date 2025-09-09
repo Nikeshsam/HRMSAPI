@@ -10,8 +10,8 @@ import Employees from "../model/Employees.model.js";
 export const registerCompany = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
-    const { name, email, organizationName, password, confirmPassword } = req.body;
-
+    const {  email, organizationName, password, confirmPassword } = req.body;
+    const name=organizationName;
     if (!name || !email || !organizationName || !password || !confirmPassword) {
         return res.status(400).json({ message: 'All fields are required' });
     }

@@ -8,6 +8,10 @@ name: {
     minLength: 2,
     maxLength: 100,
 },
+empSeq:{
+    type:Number,
+    default:0,
+},
 email: {
     type: String,
     required: [true, 'Email is required'],
