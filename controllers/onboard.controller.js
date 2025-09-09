@@ -392,33 +392,44 @@ export const exportEmployeesExcel = async (req, res) => {
 }
 
 
+
 export const getEmployeeId = async (req, res) => {
     const user = req.user;
-    const company = user.company;
+    const companyId = user.company;
 
     if (!user || user.role !== 'admin') {
         return res.status(401).json({ message: 'Unauthorized' });
     }
 
+    const session = await mongoose.startSession();
+
     try {
-        const session = mongoose.startSession();
-        (await session).startTransaction();
-        // Increment empSeq and save
-        const companySeq = await CompanyRegistration.findById(company);
-        companySeq.empSeq += 1;
-        await companySeq.save();
+        session.startTransaction();
+
+        // Find the company document with the session
+        const company = await CompanyRegistration.findById(companyId).session(session);
+
+        if (!company) {
+            throw new Error('Company not found');
+        }
+
+        // Increment empSeq
+        company.empSeq += 1;
+        await company.save({ session });
 
         // Generate employee ID
-        const employeeId = `EMP${companySeq.organizationName.slice(0, 2).toUpperCase()}${companySeq.empSeq.toString().padStart(5, '0')}`;
+        const employeeId = `EMP${company.organizationName.slice(0, 2).toUpperCase()}${company.empSeq.toString().padStart(5, '0')}`;
+
+        // Commit transaction
         await session.commitTransaction();
-        await session.endSession();
-        // Send the response
+
         return res.status(200).json({ employeeId });
 
     } catch (error) {
-         await session.abortTransaction();
-        await session.endSession();
         console.error('Error generating employee ID:', error);
+        await session.abortTransaction();
         return res.status(500).json({ message: 'Internal Server Error' });
+    } finally {
+        await session.endSession();
     }
 };
