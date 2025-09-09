@@ -60,7 +60,7 @@ export const onboardEmployee = async (req, res)  => {
             return res.status(400).json({message:'User already exist with the same email'})
         }
         
-        const password =employeeId; 
+        const password ='admin@123'; 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 

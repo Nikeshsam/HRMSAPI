@@ -11,7 +11,7 @@ const genOnboardEmailTemplate = (employee) =>  `
       <ul>
         <li>URL: ${FRONTEND_URL}</li>
         <li>Email: ${employee.email}</li>
-        <li>password: ${employee.email}</li>
+        <li>password: admin@123</li>
       </ul>
 
       <p>We look forward to a successful journey together!</p>
