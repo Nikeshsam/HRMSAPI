@@ -390,3 +390,35 @@ export const exportEmployeesExcel = async (req, res) => {
     }
 
 }
+
+
+export const getEmployeeId = async (req, res) => {
+    const user = req.user;
+    const company = user.company;
+
+    if (!user || user.role !== 'admin') {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    try {
+        const session = mongoose.startSession();
+        (await session).startTransaction();
+        // Increment empSeq and save
+        const companySeq = await CompanyRegistration.findById(company);
+        companySeq.empSeq += 1;
+        await companySeq.save();
+
+        // Generate employee ID
+        const employeeId = `EMP${companySeq.organizationName.slice(0, 2).toUpperCase()}${companySeq.empSeq.toString().padStart(5, '0')}`;
+        await session.commitTransaction();
+        await session.endSession();
+        // Send the response
+        return res.status(200).json({ employeeId });
+
+    } catch (error) {
+         await session.abortTransaction();
+        await session.endSession();
+        console.error('Error generating employee ID:', error);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+};
