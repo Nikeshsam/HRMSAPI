@@ -418,7 +418,7 @@ export const getEmployeeId = async (req, res) => {
         await company.save({ session });
 
         // Generate employee ID
-        const employeeId = `EMP${company.organizationName.slice(0, 2).toUpperCase()}${company.empSeq.toString().padStart(5, '0')}`;
+        const employeeId = `EMP${company.organizationName.slice(0, 2).toUpperCase()}${company.empSeq.toString().padStart(3, '0')}`;
 
         // Commit transaction
         await session.commitTransaction();

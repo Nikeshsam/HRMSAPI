@@ -47,17 +47,17 @@ export const registerCompany = async (req, res) => {
         
         await newUser.save({session});
 
-        const employeeId = `EMP${organizationName.slice(0,2).toUpperCase()}001`
+        // const employeeId = `EMP${organizationName.slice(0,2).toUpperCase()}001`
 
-        const newEmployee = new Employees({
-            userId: newUser._id,
-            employeeId,
-            firstName: name,
-            email: email,
-            employeeType: 'admin'
-        })
+        // const newEmployee = new Employees({
+        //     userId: newUser._id,
+        //     employeeId,
+        //     firstName: name,
+        //     email: email,
+        //     employeeType: 'admin'
+        // })
 
-        await newEmployee.save({session});
+        // await newEmployee.save({session});
         
         await session.commitTransaction();
         session.endSession();
