@@ -11,7 +11,7 @@ import authRouter from './routes/auth.router.js';
 import organizationRouter from './routes/organization.router.js';
 import onboardRouter from './routes/onboard.router.js';
 import employeeDetailsRouter from './routes/employeeDetails.router.js';
-
+import holidayRouter from './routes/holiday.router.js';
 const app = express();
 
 // Middleware
@@ -27,6 +27,7 @@ app.use('/api/v1/authentication', authRouter);
 app.use('/api/v1/organization', organizationRouter);
 app.use('/api/v1/employee', onboardRouter);
 app.use('/api/v1/employeeDetails', employeeDetailsRouter);
+app.use('/api/v1/holiday', holidayRouter);
 
 // Root route
 app.get('/api/', (req, res) => {
