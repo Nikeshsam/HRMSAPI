@@ -12,6 +12,15 @@ const holidaySchema = new mongoose.Schema({
     description: {
         type: String
     },
+    restrictedHoliday: {
+        type: String,
+        enum: ["Yes", "No"],
+        default: "No"
+    },
+    holidayday: {
+        type: String,
+        enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    },
     company: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "CompanyRegistrationDetails",
