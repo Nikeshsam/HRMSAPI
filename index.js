@@ -12,6 +12,7 @@ import organizationRouter from './routes/organization.router.js';
 import onboardRouter from './routes/onboard.router.js';
 import employeeDetailsRouter from './routes/employeeDetails.router.js';
 import holidayRouter from './routes/holiday.router.js';
+import leaveMasterRouter from './routes/leaveMaster.router.js';
 const app = express();
 
 // Middleware
@@ -28,6 +29,7 @@ app.use('/api/v1/organization', organizationRouter);
 app.use('/api/v1/employee', onboardRouter);
 app.use('/api/v1/employeeDetails', employeeDetailsRouter);
 app.use('/api/v1/holiday', holidayRouter);
+app.use('/api/v1/leaveMaster', leaveMasterRouter);
 
 // Root route
 app.get('/api/', (req, res) => {

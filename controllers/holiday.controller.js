@@ -6,7 +6,7 @@ export const createorUpdateHoliday = async (req, res) => {
     const session = await mongoose.startSession();
     try {
         session.startTransaction();
-        const { holidayname, holidaydate, description, _id, holidayday, restrictedHoliday } = req.body;
+        const { holidayname, holidaydate, description, holidayday, restrictedHoliday, _id } = req.body;
         if (!holidayname || !holidaydate) {
             session.abortTransaction();
             session.endSession();
