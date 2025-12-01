@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import Holiday from "../model/Holiday.model.js";
-
+import dayjs from "dayjs";
 
 export const createorUpdateHoliday = async (req, res) => {
     const session = await mongoose.startSession();
@@ -13,7 +13,11 @@ export const createorUpdateHoliday = async (req, res) => {
             return res.status(400).json({ message: "Holiday name and date are required" });
         }
         const user = req.user;
-        const holiday = await Holiday.findById(_id);
+        let holiday;
+        if(mongoose.Types.ObjectId.isValid(_id)){
+            // valid id or creating new
+            holiday = await Holiday.findById(_id).session(session);
+        }
         if (holiday) {
             // Update existing holiday
             holiday.holidayname = holidayname;
@@ -21,13 +25,13 @@ export const createorUpdateHoliday = async (req, res) => {
             holiday.description = description;
             holiday.holidayday = holidayday;
             holiday.restrictedHoliday = restrictedHoliday;
-            await holiday.save();
+            await holiday.save({ session });
             await session.commitTransaction();
             await session.endSession();
             return res.status(200).json({ message: "Holiday updated successfully", holiday });
         }
         const existingHoliday = await Holiday.findOne({ holidaydate, company: user.company });
-        if (existingHoliday && (!_id || existingHoliday._id.toString() !== _id)) {
+        if (existingHoliday) {
             await session.abortTransaction();
             await session.endSession();
             return res.status(400).json({ message: "Holiday already exists on the date" });
@@ -35,7 +39,7 @@ export const createorUpdateHoliday = async (req, res) => {
 
             // Create new holiday
             const newHoliday = new Holiday({ holidayname, holidaydate, description, holidayday, restrictedHoliday, company: user.company });
-            await newHoliday.save();
+            await newHoliday.save({ session });
             await session.commitTransaction();
             await session.endSession();
             return res.status(201).json({ message: "Holiday created successfully", holiday: newHoliday });
@@ -58,7 +62,13 @@ export const getHolidays = async (req, res) => {
             query.holidayname = { $regex: search, $options: 'i' };
             holidays = await Holiday.find(query);
         }
-        return res.status(200).json({ holidays });
+
+        const formattedHolidays = holidays.map(h => ({
+            ...h._doc,
+            holidaydate: dayjs(h.holidaydate).format("YYYY-MM-DD")
+            }));
+
+        return res.status(200).json({ holidays: formattedHolidays });
     } catch (error) {
         console.error("Error fetching holidays:", error);
         return res.status(500).json({ message: "Internal server error" });

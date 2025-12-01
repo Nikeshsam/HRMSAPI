@@ -14,7 +14,6 @@ const holidaySchema = new mongoose.Schema({
     },
     restrictedHoliday: {
         type: String,
-        enum: ["Yes", "No"],
         default: "No"
     },
     holidayday: {

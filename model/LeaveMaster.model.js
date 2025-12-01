@@ -17,21 +17,19 @@ const leaveMasterSchema = new mongoose.Schema({
     },
     leaveCategory: {
         type: String,
-        enum: ["Paid", "Unpaid", "Special", "Maternity", "Other"],
         required: true
     },
     genderEligibility: {
         type: String,
-        enum: ["All", "Male", "Female", "Other"],
         default: "All"
     },
     monthlyAccrual: {
-        type: Boolean,
-        default: false
+        type: String,
+        default: "false"
     },
     carryForwardAllowed: {
-        type: Boolean,
-        default: false
+        type: String,
+        default: "false"
     },
     maxCarryForward: {
         type: Number,   // ✅ Decimal128 is rarely needed here

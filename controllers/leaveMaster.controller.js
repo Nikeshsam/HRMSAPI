@@ -30,7 +30,7 @@ export const createOrUpdateLeaveMaster = async (req, res) => {
         const company = user.company;
         let leaveMaster;
 
-        if (_id) {
+        if (mongoose.Types.ObjectId.isValid(_id)) {
             //  Update existing leave type
             leaveMaster = await LeaveMaster.findOneAndUpdate(
                 { _id, company },
