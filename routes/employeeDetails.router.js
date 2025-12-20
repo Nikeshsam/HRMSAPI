@@ -10,6 +10,7 @@ import { createOrUpdateEmployeeBenefits, deleteEmployeeBenefit, getEmployeeBenef
 import { createOrUpdateEmployeeHealthRecord, deleteEmployeeVaccinationRecord, getEmployeeHealthRecord } from '../controllers/employeeHealthRecord.controller.js';
 import { createOrUpdateEmployeeTravelDetails, deleteEmployeeVisaDetails, getEmployeeTravelRecord } from '../controllers/employeeTravelDetails.controller.js';
 import { getLoggedEmployee } from '../controllers/onboard.controller.js';
+import { getEmployeeDetails } from '../controllers/employeeDetails.controller.js';
 const employeeDetailsRouter = Router();
 
 
@@ -34,7 +35,7 @@ employeeDetailsRouter.get('/experience', authorize, getEmployeeExperienceDetails
 employeeDetailsRouter.get('/benefits', authorize, getEmployeeBenefits);
 employeeDetailsRouter.get('/health-record', authorize, getEmployeeHealthRecord);
 employeeDetailsRouter.get('/travel-record', authorize, getEmployeeTravelRecord);
-
+employeeDetailsRouter.get('/employeeDetails',authorize,getEmployeeDetails);
 
 
 employeeDetailsRouter.get('/basic',authorize,getEmployeeBasicDetails);
