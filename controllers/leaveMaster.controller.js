@@ -29,6 +29,14 @@ export const createOrUpdateLeaveMaster = async (req, res) => {
 
         const company = user.company;
         let leaveMaster;
+        let monthlyAccuralBoolean = false;
+        let carryForwardAllowedBoolean = false;
+        if(monthlyAccrual === "accrual"){
+            monthlyAccuralBoolean = true;
+        }
+        if(carryForwardAllowed === "allow"){
+            carryForwardAllowedBoolean = true;
+        }
 
         if (mongoose.Types.ObjectId.isValid(_id)) {
             //  Update existing leave type
@@ -39,8 +47,8 @@ export const createOrUpdateLeaveMaster = async (req, res) => {
                     description,
                     leaveCategory,
                     genderEligibility,
-                    monthlyAccrual,
-                    carryForwardAllowed,
+                    monthlyAccrual: monthlyAccuralBoolean,
+                    carryForwardAllowed: carryForwardAllowedBoolean,
                     maxCarryForward,
                     allowHalfDay,
                     validFrom,
@@ -69,8 +77,8 @@ export const createOrUpdateLeaveMaster = async (req, res) => {
                 description,
                 leaveCategory,
                 genderEligibility,
-                monthlyAccrual,
-                carryForwardAllowed,
+                monthlyAccrual: monthlyAccuralBoolean,
+                carryForwardAllowed: carryForwardAllowedBoolean,
                 maxCarryForward,
                 allowHalfDay,
                 validFrom,
@@ -95,7 +103,7 @@ export const createOrUpdateLeaveMaster = async (req, res) => {
         if (session) await session.abortTransaction();
         return res.status(error.status || 500).json({
             message: error.message || "Internal Server Error",
-            error
+            error: error
         });
     } finally {
         if (session) await session.endSession();
@@ -118,7 +126,7 @@ export const getLeaveMaster = async (req, res) => {
         }
         // Optionally filter by company or other query params
         const leaveMasters = await LeaveMaster.find(req.query);
-        return res.status(200).json(leaveMasters);
+        return res.status(200).json({ leaves: leaveMasters });
     } catch (error) {
         return res.status(error.status || 500).json({
             message: error.message || "Internal Server Error",
@@ -137,6 +145,34 @@ export const deleteLeaveMaster = async (req, res) => {
         const result = await LeaveMaster.findByIdAndDelete(id);
         if (!result) throw { status: 404, message: 'LeaveMaster not found' };
         return res.status(200).json({ message: 'LeaveMaster deleted successfully' });
+    } catch (error) {
+        return res.status(error.status || 500).json({
+            message: error.message || "Internal Server Error",
+            error
+        });
+    }
+};
+
+export const getLeaveMasterCombo = async (req, res) => {
+    try {
+        const user = req.user;
+        if (!user) {
+            throw { status: 401, message: 'Unauthorized' };
+        }
+        if (!user.company) {
+            throw { status:404 , message: 'User Company not found' };
+        }
+        const leaveMaster = await LeaveMaster.find({ company: user.company }).select("_id leaveName");
+    
+        if (!leaveMaster || leaveMaster.length === 0) {
+        return res.status(404).json({ message: "LeaveMaster not found" });
+        }
+        const combo = leaveMaster.map(lm => ({
+            value: lm._id,
+            label: lm.leaveName
+        }));
+
+        return res.status(200).json({leaveMasterCombo: combo});
     } catch (error) {
         return res.status(error.status || 500).json({
             message: error.message || "Internal Server Error",

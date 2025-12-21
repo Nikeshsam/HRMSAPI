@@ -24,12 +24,12 @@ const leaveMasterSchema = new mongoose.Schema({
         default: "All"
     },
     monthlyAccrual: {
-        type: String,
-        default: "false"
+        type: Boolean,
+        default: false
     },
     carryForwardAllowed: {
-        type: String,
-        default: "false"
+        type: Boolean,
+        default: false
     },
     maxCarryForward: {
         type: Number,   // ✅ Decimal128 is rarely needed here
