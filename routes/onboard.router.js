@@ -2,6 +2,7 @@ import { Router } from "express";
 import authorize from "../middlewares/auth.middleware.js";
 import { deleteEmployee, getEmployee, getEmployees, onboardEmployee, updateEmployee, exportEmployeesExcel, getEmployeeId } from "../controllers/onboard.controller.js";
 import { createUploadMiddleware } from "../middlewares/uploadFile.middleware.js";
+import { getEmployeeDetailsBasedOnId } from "../controllers/employeeDetails.controller.js";
 
 const onboardRouter = Router();
 
@@ -10,6 +11,7 @@ onboardRouter.post("/",authorize,createUploadMiddleware({
     fileSize: 10,
 }),onboardEmployee);
 onboardRouter.get("/",authorize,getEmployees); 
+onboardRouter.get('/:id',authorize,getEmployeeDetailsBasedOnId);
 
 onboardRouter.get("/export",authorize, exportEmployeesExcel);
 onboardRouter.get('/empId',authorize,getEmployeeId);
