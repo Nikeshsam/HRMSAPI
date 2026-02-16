@@ -11,10 +11,11 @@ onboardRouter.post("/",authorize,createUploadMiddleware({
     fileSize: 10,
 }),onboardEmployee);
 onboardRouter.get("/",authorize,getEmployees); 
-onboardRouter.get('/:id',authorize,getEmployeeDetailsBasedOnId);
 
 onboardRouter.get("/export",authorize, exportEmployeesExcel);
 onboardRouter.get('/empId',authorize,getEmployeeId);
+
+onboardRouter.get('/:id',authorize,getEmployeeDetailsBasedOnId);
 onboardRouter.put("/:id",authorize,createUploadMiddleware({
     fieldName: "offerletter",
     fileSize: 10,

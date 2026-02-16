@@ -49,7 +49,7 @@ export const createOrUpdateEmployeeHealthRecord = async (req, res) => {
 
         if (healthRecord) {
             healthRecord.bloodGroup = bloodGroup;
-            healthRecord.isBloodDonor = isBloodDonor;
+            healthRecord.isBloodDonor = isBloodDonor==="1"?true:false;
             healthRecord.allergies = allergies;
             healthRecord.preExistingIllnesses = preExistingIllnesses;
             for (const vac of vaccinations) {
