@@ -26,7 +26,7 @@ export const getEmployeeDetails = async (req, res) => {
 
         // Fetch employee's basic details
         const employeeBasicDetails = await EmployeeBasicDetails.findOne({ employee: employee._id });
-        const employeeBenefits = await EmployeeBenefits.find({ employee: employee._id });
+        const employeeBenefits = await EmployeeBenefits.find({ employeeId: employee._id });
         const employeeCertifications = await EmployeeCertification.find({ employee: employee._id });
         const employeeContactDetails = await EmployeeContactDetails.findOne({ employee: employee._id });
         const employeeEducationDetails = await EmployeeEducationDetails.find({ employee: employee._id });
@@ -51,7 +51,7 @@ export const getEmployeeDetails = async (req, res) => {
             employeeExperience,
             employeeHealthRecord,
             employeeTravelDetails,
-            employeeDependentDetails
+            employeeFamilyDetails:employeeDependentDetails
         });
     }
     catch (error) {
