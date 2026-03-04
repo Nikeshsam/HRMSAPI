@@ -9,6 +9,7 @@ import EmployeeEducationDetails from '../model/EmployeeEducationDetails.model.js
 import EmployeeExperience from "../model/EmployeeExperience.model.js";
 import EmployeeHealthRecord from "../model/EmployeeHelthRecord.model.js";
 import EmployeeTravelDetails from "../model/EmployeeTravelDetails.model.js";
+import Organization from "../model/OrganizationModel.js";
 
 export const getEmployeeDetails = async (req, res) => {
     const user = req.user;
@@ -34,6 +35,7 @@ export const getEmployeeDetails = async (req, res) => {
         const employeeHealthRecord = await EmployeeHealthRecord.findOne({ employee: employee._id });
         const employeeTravelDetails = await EmployeeTravelDetails.find({ employee: employee._id });
         const employeeDependentDetails = await EmployeeDependentDetails.find({ employee: employee._id });
+        const companyProfileStatus = await Organization.findOne({ company: user.company });
 
 
         if (!employeeBasicDetails) {
@@ -51,7 +53,8 @@ export const getEmployeeDetails = async (req, res) => {
             employeeExperience,
             employeeHealthRecord,
             employeeTravelDetails,
-            employeeFamilyDetails:employeeDependentDetails
+            employeeFamilyDetails:employeeDependentDetails,
+            companyProfileStatus
         });
     }
     catch (error) {
