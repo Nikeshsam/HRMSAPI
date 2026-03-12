@@ -60,6 +60,26 @@ const employeeSchema = new mongoose.Schema({
         contentType: String,
         fileName:String,
     },
+    manager:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Employees'
+    },
+    probation:{
+        type: String,
+        trim: true
+    },
+    packageCTC:{
+        type: Number,
+        min: 0
+    },
+    payFrequency:{
+        type: String,
+        trim: true
+    },
+    totalExperience:{
+        type: String,
+        trim: true
+    },
     status:{
         type: String,
         enum: ['Pending', 'Completed', 'Rejected'],

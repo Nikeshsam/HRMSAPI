@@ -22,7 +22,12 @@ export const onboardEmployee = async (req, res)  => {
         workLocation,
         employmentType,
         joiningDate,
-        employeeType
+        employeeType,
+        manager,
+        probation,
+        packageCTC,
+        payFrequency,
+        totalExperience
     } = req.body;
     
     const file = req.file;
@@ -86,7 +91,12 @@ export const onboardEmployee = async (req, res)  => {
             workLocation,
             employmentType,
             joiningDate,
-            offerLetter
+            offerLetter,
+            manager,
+            probation,
+            packageCTC,
+            payFrequency,
+            totalExperience
         })
         const {name} = await CompanyRegistration.findById({_id:company});
 
@@ -257,7 +267,12 @@ export const updateEmployee = async(req,res) => {
         workLocation,
         employmentType,
         joiningDate,
-        employeeType
+        employeeType,
+        manager,
+        probation,
+        packageCTC,
+        payFrequency,
+        totalExperience
     } = req.body;
 
     const {id} = req.params;
@@ -302,7 +317,12 @@ export const updateEmployee = async(req,res) => {
                 workLocation,
                 employmentType,
                 joiningDate,
-                employeeType
+                employeeType,
+                manager,
+                probation,
+                packageCTC,
+                payFrequency,
+                totalExperience
             };
 
         if (offerLetter) {
