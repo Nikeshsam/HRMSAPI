@@ -453,3 +453,27 @@ export const getEmployeeId = async (req, res) => {
         await session.endSession();
     }
 };
+
+export const getManagersByDepartment = async (req, res) => {
+  try {
+
+    const { departmentId } = req.params;
+
+    const managerDesignationIds = [
+      4,5,9,10,14,15,19,22,25,26,30,33
+    ];
+
+    const managers = await Employees.find({
+      department: departmentId,
+      designation: { $in: managerDesignationIds }
+    }).select("employeeId firstName lastName designation department");
+
+    res.json({
+      message: "Managers fetched successfully",
+      managers
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

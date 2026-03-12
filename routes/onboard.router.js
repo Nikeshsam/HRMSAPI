@@ -1,6 +1,6 @@
 import { Router } from "express";
 import authorize from "../middlewares/auth.middleware.js";
-import { deleteEmployee, getEmployee, getEmployees, onboardEmployee, updateEmployee, exportEmployeesExcel, getEmployeeId } from "../controllers/onboard.controller.js";
+import { deleteEmployee, getEmployee, getEmployees, onboardEmployee, updateEmployee, exportEmployeesExcel, getEmployeeId, getManagersByDepartment } from "../controllers/onboard.controller.js";
 import { createUploadMiddleware } from "../middlewares/uploadFile.middleware.js";
 import { getEmployeeDetailsBasedOnId } from "../controllers/employeeDetails.controller.js";
 
@@ -22,6 +22,6 @@ onboardRouter.put("/:id",authorize,createUploadMiddleware({
 }),updateEmployee);
 onboardRouter.get("/:id",authorize,getEmployee);
 onboardRouter.delete("/:id",authorize,deleteEmployee);
-
+onboardRouter.get("/managers/:departmentId",authorize,getManagersByDepartment);
 
 export default onboardRouter;
