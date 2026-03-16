@@ -457,17 +457,27 @@ export const getEmployeeId = async (req, res) => {
 export const getManagersByDepartment = async (req, res) => {
   try {
 
+    const user = req.user;
+    if (!user || user.role !== 'admin') {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
     const { departmentId } = req.params;
 
     const managerDesignationIds = [
       4,5,9,10,14,15,19,22,25,26,30,33
     ];
 
-    const managers = await Employees.find({
+    let managers;
+    managers = await Employees.find({
       department: departmentId,
       designation: { $in: managerDesignationIds }
-    }).select("employeeId firstName lastName designation department");
+    }).select("employeeId firstName lastName designation department _id");
 
+    if(!managers.length || managers.length === 0){
+       managers = await Employees.find({
+        designation: { $in: managerDesignationIds }
+      }).select("employeeId firstName lastName designation department _id"); 
+    }
     res.json({
       message: "Managers fetched successfully",
       managers
