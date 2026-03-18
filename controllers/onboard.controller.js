@@ -1,17 +1,17 @@
 import Employees from "../model/Employees.model.js";
 import User from "../model/User.model.js";
 import { generateExcelFromJSON } from "../services/excelExport.service.js";
-import mongoose from "mongoose";
+import mongoose, { mongo } from "mongoose";
 import bcrypt from "bcryptjs";
 import CompanyRegistration from "../model/CompanyRegister.model.js";
 import { sendEmail } from "../utils/send-email.js";
 import Organization from "../model/OrganizationModel.js";
 
 
-export const onboardEmployee = async (req, res)  => {
-    const session =  await mongoose.startSession();
+export const onboardEmployee = async (req, res) => {
+    const session = await mongoose.startSession();
     session.startTransaction();
-    const {
+    let {
         employeeId,
         firstName,
         lastName,
@@ -29,43 +29,45 @@ export const onboardEmployee = async (req, res)  => {
         payFrequency,
         totalExperience
     } = req.body;
-    
+
     const file = req.file;
     let offerLetter = null;
 
     if (file) {
         offerLetter = {
-        base64: file.buffer.toString('base64'),
-        contentType: file.mimetype,
-        fileName:file.originalname,
+            base64: file.buffer.toString('base64'),
+            contentType: file.mimetype,
+            fileName: file.originalname,
         };
     }
 
     const user = req.user;
-    
+
     if (!user || !user.company) {
-         return res.status(401).json({ message: 'Unauthorized' });
+        return res.status(401).json({ message: 'Unauthorized' });
     }
-    
+
     const company = user.company;
     if (!employeeId || !firstName || !lastName || !email || !phoneNumber || !department || !designation || !workLocation || !employmentType || !joiningDate) {
         return res.status(400).json({ message: 'All fields are required' });
     }
-    
-        
 
-    try{
-        const existingEmployee = await Employees.findOne({employeeId});
-        
-        if(existingEmployee){
-            return res.status(400).json({message: 'Employee already onboarded with this ID'});
+    if (!mongoose.isValidObjectId(manager)) {
+        manager = null;
+    }
+
+    try {
+        const existingEmployee = await Employees.findOne({ employeeId }).session(session);
+
+        if (existingEmployee) {
+            return res.status(400).json({ message: 'Employee already onboarded with this ID' });
         }
-        const existingUser=await User.findOne({email});
-        if(existingUser){
-            return res.status(400).json({message:'User already exist with the same email'})
+        const existingUser = await User.findOne({ email }).session(session);
+        if (existingUser) {
+            return res.status(400).json({ message: 'User already exist with the same email' })
         }
-        
-        const password ='admin@123'; 
+
+        const password = 'admin@123';
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -77,10 +79,10 @@ export const onboardEmployee = async (req, res)  => {
             company: company,
         });
         await newUser.validate();
-        await newUser.save({session});
+        await newUser.save({ session });
 
         const newEmployee = new Employees({
-            userId:newUser._id,
+            userId: newUser._id,
             employeeId,
             firstName,
             lastName,
@@ -98,43 +100,43 @@ export const onboardEmployee = async (req, res)  => {
             payFrequency,
             totalExperience
         })
-        const {name} = await CompanyRegistration.findById({_id:company});
+        const { name } = await CompanyRegistration.findById({ _id: company });
 
         await newEmployee.validate(); // Validate the new employee data
-        await newEmployee.save({session});
-        
+        await newEmployee.save({ session });
+
         await sendEmail({
-            to:email,
-            type:'add Employee',
-            employee:{
-            firstName,
-            lastName,
-            email,
-            phoneNumber,
-            department,
-            designation,
-            workLocation,
-            employmentType,
-            joiningDate,
-            companyName:name
-        },
+            to: email,
+            type: 'add Employee',
+            employee: {
+                firstName,
+                lastName,
+                email,
+                phoneNumber,
+                department,
+                designation,
+                workLocation,
+                employmentType,
+                joiningDate,
+                companyName: name
+            },
         })
-        
+
 
         await session.commitTransaction();
         session.endSession();
 
-        return res.status(201).json({message: 'Employee onboarded successfully'});
-    }catch(error){
+        return res.status(201).json({ message: 'Employee onboarded successfully' });
+    } catch (error) {
         await session.abortTransaction();
         session.endSession();
-        return res.status(500).json({error});
+        return res.status(500).json({ error });
     }
 }
 
 export const getEmployees = async (req, res) => {
-     const user = req.user;
-    const { searchTerm = '', page = 1, limit = 10, position = '', department = '', status = ''  } = req.query;
+    const user = req.user;
+    const { searchTerm = '', page = 1, limit = 10, position = '', department = '', status = '' } = req.query;
     const company = user?.company;
 
     if (!user || (!company && user.role !== 'admin')) {
@@ -150,30 +152,30 @@ export const getEmployees = async (req, res) => {
         const userIds = users.map(user => user._id);
 
         const regex = new RegExp(searchTerm, 'i');
-        
+
 
         const filter = {
             userId: { $in: userIds },
             ...(searchTerm && {
-              $or: [
-                { firstName: regex },
-                { lastName: regex },
-                { email: regex }
-              ]
+                $or: [
+                    { firstName: regex },
+                    { lastName: regex },
+                    { email: regex }
+                ]
             }),
             ...(position && { designation: position }),
             ...(department && { department }),
             ...(status && { status }),
-          };
-      
+        };
+
         const skip = (parseInt(page) - 1) * parseInt(limit);
         const parsedLimit = parseInt(limit);
 
         const [employees, total] = await Promise.all([
             Employees.find(filter).skip(skip).limit(parsedLimit).lean(),
             Employees.countDocuments(filter),
-          ]);
-      
+        ]);
+
         // const employees = await Employees.find({
         //     userId: { $in: userIds },
         //     $or: [
@@ -216,43 +218,43 @@ export const getEmployees = async (req, res) => {
 
 export const getEmployee = async (req, res) => {
     const user = req.user;
-    const {id} = req.params;
-    if(!user || !user.company && user.role !=='admin'){
-        return res.status(401).json({message:'Unauthorized'})
+    const { id } = req.params;
+    if (!user || !user.company && user.role !== 'admin') {
+        return res.status(401).json({ message: 'Unauthorized' })
     }
-    try{
-        const employee = await Employees.find({id});
+    try {
+        const employee = await Employees.find({ id });
         return res.status(200).json({
-            success:true,
-            message:'Employee data retrieved successfully',
-            data:employee,
+            success: true,
+            message: 'Employee data retrieved successfully',
+            data: employee,
         });
-    }catch(error){  
-        return res.status(500).json({message:error});
+    } catch (error) {
+        return res.status(500).json({ message: error });
     }
 
 }
 
 export const getLoggedEmployee = async (req, res) => {
     const user = req.user;
-    if(!user || !user.company && user.role !=='admin'){
-        return res.status(401).json({message:'Unauthorized'})
+    if (!user || !user.company && user.role !== 'admin') {
+        return res.status(401).json({ message: 'Unauthorized' })
     }
-    try{
-        const employee = await Employees.findOne({userId:user._id});
+    try {
+        const employee = await Employees.findOne({ userId: user._id });
         return res.status(200).json({
-            success:true,
-            message:'Employee data retrieved successfully',
-            data:employee,
+            success: true,
+            message: 'Employee data retrieved successfully',
+            data: employee,
         });
-    }catch(error){  
-        return res.status(500).json({message:error});
+    } catch (error) {
+        return res.status(500).json({ message: error });
     }
 
 }
 
 
-export const updateEmployee = async(req,res) => {
+export const updateEmployee = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     const user = req.user;
@@ -275,55 +277,55 @@ export const updateEmployee = async(req,res) => {
         totalExperience
     } = req.body;
 
-    const {id} = req.params;
+    const { id } = req.params;
 
     const file = req.file;
     let offerLetter = null;
 
     if (file) {
         offerLetter = {
-        base64: file.buffer.toString('base64'),
-        contentType: file.mimetype,
-        fileName:file.originalname,
+            base64: file.buffer.toString('base64'),
+            contentType: file.mimetype,
+            fileName: file.originalname,
         };
     }
 
-    if(!user || user.role !== 'admin'){
+    if (!user || user.role !== 'admin') {
         await session.abortTransaction();
         session.endSession();
-        return res.status(401).json({message:'Unauthorized'});
+        return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    if(!id || !mongoose.isValidObjectId(id)){
+    if (!id || !mongoose.isValidObjectId(id)) {
         await session.abortTransaction();
         session.endSession();
-        return res.status(400).json({message:'Invalid employee ID'});
+        return res.status(400).json({ message: 'Invalid employee ID' });
     }
     const existingEmployee = await Employees.findById(id);
-    if(!existingEmployee){
+    if (!existingEmployee) {
         await session.abortTransaction();
         session.endSession();
-        return res.status(404).json({message:'Employee not found'});
+        return res.status(404).json({ message: 'Employee not found' });
     }
-    try{
+    try {
         const updatedEmployee = {
-                employeeId,
-                firstName,
-                lastName,
-                email,
-                phoneNumber,
-                department,
-                designation,
-                workLocation,
-                employmentType,
-                joiningDate,
-                employeeType,
-                manager,
-                probation,
-                packageCTC,
-                payFrequency,
-                totalExperience
-            };
+            employeeId,
+            firstName,
+            lastName,
+            email,
+            phoneNumber,
+            department,
+            designation,
+            workLocation,
+            employmentType,
+            joiningDate,
+            employeeType,
+            manager,
+            probation,
+            packageCTC,
+            payFrequency,
+            totalExperience
+        };
 
         if (offerLetter) {
             updatedEmployee.offerLetter = offerLetter;
@@ -332,52 +334,52 @@ export const updateEmployee = async(req,res) => {
         await Employees.findByIdAndUpdate(id, updatedEmployee, { new: true, session });
         await session.commitTransaction();
         session.endSession();
-        return res.status(200).json({message:'Employee Details Updated Successfully'});
-    }catch(error){
+        return res.status(200).json({ message: 'Employee Details Updated Successfully' });
+    } catch (error) {
         await session.abortTransaction();
         session.endSession();
-        return res.status(500).json({message:'server error during update employee details',error});
+        return res.status(500).json({ message: 'server error during update employee details', error });
     }
 }
 
-export const deleteEmployee = async(req,res) =>{
+export const deleteEmployee = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
-    const user=req.user;
-    const {id} = req.params;
-    if(!user){
-        return res.status(401).json({message:'UnAuthorized'})
+    const user = req.user;
+    const { id } = req.params;
+    if (!user) {
+        return res.status(401).json({ message: 'UnAuthorized' })
     }
-    try{
-        const emp = await Employees.findOne({_id:id});
-        if(!emp){
+    try {
+        const emp = await Employees.findOne({ _id: id });
+        if (!emp) {
             await session.abortTransaction();
             await session.endSession();
-            return res.status(404).json({message:'Employee with the id not found'});
+            return res.status(404).json({ message: 'Employee with the id not found' });
         }
         const empUserId = emp.userId._id;
-        await Employees.findByIdAndDelete(id,{session});
-        await User.findByIdAndDelete({_id:empUserId},{session});
+        await Employees.findByIdAndDelete(id, { session });
+        await User.findByIdAndDelete({ _id: empUserId }, { session });
         await session.commitTransaction();
         await session.endSession();
-        res.status(200).json({message:'Employee deleted Successfully'});
-    }catch(error){
+        res.status(200).json({ message: 'Employee deleted Successfully' });
+    } catch (error) {
         await session.abortTransaction();
         await session.endSession();
-        return res.status(500).json({message:'server error during delete employee'});
+        return res.status(500).json({ message: 'server error during delete employee' });
     }
 }
 
 export const exportEmployeesExcel = async (req, res) => {
     const user = req.user;
     const company = user.company;
-    if(!user || user.role !=='admin'){
-        return res.status(401).json({message:'Unauthorized'})
+    if (!user || user.role !== 'admin') {
+        return res.status(401).json({ message: 'Unauthorized' })
     }
-    try{
-        const users= await User.find({company}).select('_id'); // Fetching only user IDs for employees in the company
+    try {
+        const users = await User.find({ company }).select('_id'); // Fetching only user IDs for employees in the company
         if (!users || users.length === 0) {
-            return res.status(404).json({message:'No employees found for this company'});
+            return res.status(404).json({ message: 'No employees found for this company' });
         }
         const userIds = users.map(user => user._id);
         const employees = await Employees.find(
@@ -401,12 +403,12 @@ export const exportEmployeesExcel = async (req, res) => {
         }));
 
         const excelBuffer = generateExcelFromJSON(mappedEmployees);
-        
+
         res.setHeader('Content-Disposition', 'attachment; filename=EmployeeData.xlsx');
         res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         res.send(excelBuffer);
-    }catch(error){  
-        return res.status(500).json({message:error});
+    } catch (error) {
+        return res.status(500).json({ message: error });
     }
 
 }
@@ -456,28 +458,32 @@ export const getEmployeeId = async (req, res) => {
 
 export const getManagersByDepartment = async (req, res) => {
   try {
-
     const user = req.user;
-    if (!user || user.role !== 'admin') {
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
-    const { departmentId } = req.params;
 
+    if (!user || user.role !== "admin") {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const deptId = Number(req.params.departmentId);
+
+        console.log("Department ID received:", deptId);
     const managerDesignationIds = [
-      4,5,9,10,14,15,19,22,25,26,30,33
+      4, 5, 9, 10, 14, 15, 19, 22, 25, 26, 30, 33
     ];
 
-    let managers;
-    managers = await Employees.find({
-      department: departmentId,
-      designation: { $in: managerDesignationIds }
+    let managers = await Employees.find({
+      designation: { $in: managerDesignationIds },
+      department: deptId
     }).select("employeeId firstName lastName designation department _id");
+    console.log("Managers found for department:", managers);
+    if (!managers.length) {
+      managers = await Employees.find({
+        manager: null
+      }).select("employeeId firstName lastName designation department _id");
+          console.log("Managers found for department:", managers);
 
-    if(!managers.length || managers.length === 0){
-       managers = await Employees.find({
-        designation: { $in: managerDesignationIds }
-      }).select("employeeId firstName lastName designation department _id"); 
     }
+
     res.json({
       message: "Managers fetched successfully",
       managers

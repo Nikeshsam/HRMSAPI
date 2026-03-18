@@ -62,7 +62,8 @@ const employeeSchema = new mongoose.Schema({
     },
     manager:{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Employees'
+        ref: 'Employees',
+        required: false
     },
     probation:{
         type: String,
