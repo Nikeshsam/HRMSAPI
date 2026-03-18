@@ -465,10 +465,11 @@ export const getManagersByDepartment = async (req, res) => {
     }
 
     const deptId = Number(req.params.departmentId);
+    const designation = Number(req.params.designation);
 
-        console.log("Department ID received:", deptId);
+        
     const managerDesignationIds = [
-      4, 5, 9, 10, 14, 15, 19, 22, 25, 26, 30, 33
+       5, 10,  15, 19, 22, 25
     ];
 
     let managers = await Employees.find({
@@ -476,12 +477,32 @@ export const getManagersByDepartment = async (req, res) => {
       department: deptId
     }).select("employeeId firstName lastName designation department _id");
     console.log("Managers found for department:", managers);
-    if (!managers.length) {
+    if (managerDesignationIds.includes(designation)) {
       managers = await Employees.find({
-        manager: null
+        manager: null,
+        designation: 34, // Assuming 34 is the designation ID for top-level managers or company heads
       }).select("employeeId firstName lastName designation department _id");
-          console.log("Managers found for department:", managers);
 
+      if(!managers.length){
+        res.status(404).json({
+        message: "Please onboard a company head",
+        managers: []
+       })
+      }
+
+    }else{
+
+    managers = await Employees.find({
+      designation: { $in: managerDesignationIds },
+      department: deptId
+    }).select("employeeId firstName lastName designation department _id");
+
+    if(managers.length === 0) {
+       res.status(404).json({
+        message: "Please onboard a manager for this department/designation",
+        managers: []
+       })
+    }
     }
 
     res.json({

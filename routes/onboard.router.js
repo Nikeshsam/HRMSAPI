@@ -22,6 +22,6 @@ onboardRouter.put("/:id",authorize,createUploadMiddleware({
 }),updateEmployee);
 onboardRouter.get("/:id",authorize,getEmployee);
 onboardRouter.delete("/:id",authorize,deleteEmployee);
-onboardRouter.get("/managers/:departmentId",authorize,getManagersByDepartment);
+onboardRouter.get("/managers/:departmentId/:designation",authorize,getManagersByDepartment);
 
 export default onboardRouter;
