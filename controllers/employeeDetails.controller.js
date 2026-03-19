@@ -20,7 +20,7 @@ export const getEmployeeDetails = async (req, res) => {
     try {
         
         // Fetch employee by ID
-        const employee = await Employees.findOne({userId:user});
+        const employee = await Employees.findOne({userId:user}).populate('manager', 'firstName lastName designation'); // only fetch needed fields;
         if (!employee) {
             return res.status(404).json({ message: 'Employee not found' });
         }
